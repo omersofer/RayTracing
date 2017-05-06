@@ -1,2 +1,2 @@
 # RayCasting
-Course: Fundamentals of Computer Graphics, Image Processing, and Vision (Assignment #1)
+Course: Fundamentals of Computer Graphics, Image Processing, and Vision (Assignment #2)
