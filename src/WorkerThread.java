@@ -20,7 +20,7 @@ public class WorkerThread implements Runnable {
 
     private void processCommand() {
         try {
-            Thread.sleep(5000);
+            Thread.sleep(500);
             pixels[i][j] = i + j;
         } catch (InterruptedException e) {
             e.printStackTrace();
