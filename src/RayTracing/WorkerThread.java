@@ -1,3 +1,5 @@
+package RayTracing;
+
 public class WorkerThread implements Runnable {
   
     private int i;
