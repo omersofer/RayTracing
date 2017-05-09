@@ -25,7 +25,9 @@ public class RayTracer
 
 	public static void main(String[] args)
 	{
-		primitiveTest();
+		System.out.println("Working Directory = " + System.getProperty("user.dir"));
+		//primitiveTest();
+		main_finalMain(args); 
 	}
 	
 	public static void primitiveTest()
@@ -118,7 +120,7 @@ public class RayTracer
 		} 
 		catch (Exception e) 
 		{
-			System.out.println(e.getMessage());
+			System.out.println(e.toString());
 		}
 	}
 
@@ -134,6 +136,8 @@ public class RayTracer
 		int lineNum = 0;
 		System.out.println("Started parsing scene file " + sceneFileName);
 
+		Set set;
+		Camera cam;
 		while ((line = r.readLine()) != null)
 		{
 			line = line.trim();
@@ -152,14 +156,14 @@ public class RayTracer
 				if (code.equals("cam"))
 				{
                     // Add code here to parse camera parameters
-
-					System.out.println(String.format("Parsed camera parameters (line %d)", lineNum));
+					cam = Camera.parseCamera(params);
+					System.out.println(String.format("Parsed camera parameters (line %d) - " + cam, lineNum));
 				}
 				else if (code.equals("set"))
 				{
                     // Add code here to parse general settings parameters
-
-					System.out.println(String.format("Parsed general settings (line %d)", lineNum));
+					set = Set.parseSet(params);
+					System.out.println(String.format("Parsed general settings (line %d) - " + set, lineNum));
 				}
 				else if (code.equals("mtl"))
 				{

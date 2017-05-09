@@ -6,25 +6,25 @@ public class Material
 	public final static int G = 1;
 	public final static int B = 2;
 	
-	private byte[] diffuseColor;
-	private byte[] specularColor;
+	private double[] diffuseColor;
+	private double[] specularColor;
 	private double specularityCoeff;
-	private byte[] reflectionColor;
+	private double[] reflectionColor;
 	private double transparencyCoeff;
 	
 	
-	public Material(byte diff_r, byte diff_g, byte diff_b,
-			byte spec_r, byte spec_g, byte spec_b,
+	public Material(double diff_r, double diff_g, double diff_b,
+			double spec_r, double spec_g, double spec_b,
 			double spec_coeff,
-			byte refl_r, byte refl_g, byte refl_b,
+			double refl_r, double refl_g, double refl_b,
 			double trans_coeff)
 	{
-		diffuseColor = new byte[3];
+		diffuseColor = new double[3];
 		diffuseColor[R] = diff_r;
 		diffuseColor[G] = diff_g;
 		diffuseColor[B] = diff_b;
 		
-		specularColor = new byte[3];
+		specularColor = new double[3];
 		specularColor[R] = spec_r;
 	    specularColor[G] = spec_g;
 		specularColor[B] = spec_b;
@@ -53,18 +53,18 @@ public class Material
 				m.transparencyCoeff);
 	}
 	
-	public byte[] getDiffuseColor() {
-		byte[] copy = new byte[3];
+	public double[] getDiffuseColor() {
+		double[] copy = new double[3];
 		System.arraycopy(diffuseColor, 0, copy, 0, diffuseColor.length);
 		return copy;
 	}
-	public byte[] getSpecularColor() {
+	public double[] getSpecularColor() {
 		return specularColor;
 	}
 	public double getSpecularityCoeff() {
 		return specularityCoeff;
 	}
-	public byte[] getReflectionColor() {
+	public double[] getReflectionColor() {
 		return reflectionColor;
 	}
 	public double getTransparencyCoeff() {

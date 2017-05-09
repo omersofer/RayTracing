@@ -107,10 +107,17 @@ public class Vector {
 	 * @param d - lengthening factor.
 	 * @return new Vector longer by factor d than original Vector.
 	 */
-	public Vector times(double d)
+	public Vector timesScalar(double d)
 	{
 		return new Vector(this.x * d,
 				this.y * d, this.z * d);
+	}
+	
+	public Vector timesVector(Vector v)
+	{
+		return new Vector(this.x * v.x,
+				this.y * v.y,
+				this.z * v.z);
 	}
 	
 	 @Override

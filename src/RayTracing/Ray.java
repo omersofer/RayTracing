@@ -23,7 +23,7 @@ public class Ray {
 	
 	public Vector getUnitTimes(double d)
 	{
-		return getVector().toUnit().times(d);
+		return getVector().toUnit().timesScalar(d);
 	}
 	
 	@Override
