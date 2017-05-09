@@ -23,6 +23,27 @@ public class RayTracer
 	public int imageWidth;
 	public int imageHeight;
 
+	public static void main(String[] args)
+	{
+		sphereTest();
+	}
+	
+	public static void sphereTest()
+	{
+		Sphere s = new Sphere(null, new Vector(5,5,5), 1);
+		Ray r = new Ray(new Vector(5,0,0), new Vector(0,1,1));
+		
+		try
+		{
+			Vector intersection = s.closerIntersectionPoint(r);
+			System.out.println("intersention of " + s + " and " + r + " is " + intersection);			
+		}
+		catch (RayTracerException e)
+		{
+			System.out.println("Failed");
+		}
+	}
+	
 	public static void vectorTest(String[] args)
 	{
 		Vector u = new Vector(3, 4, 6);
@@ -60,7 +81,7 @@ public class RayTracer
 	/**
 	 * Runs the ray tracer. Takes scene file, output image file and image size as input.
 	 */
-	public static void main(String[] args) 
+	public static void main_finalMain(String[] args) 
 	{
 		try 
 		{

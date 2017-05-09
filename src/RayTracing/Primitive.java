@@ -1,5 +1,7 @@
 package RayTracing;
 
+import RayTracing.RayTracer.RayTracerException;
+
 public abstract class Primitive {
 	
 	/**
@@ -14,7 +16,12 @@ public abstract class Primitive {
 		this.material = material;
 	}
 	
-	public abstract boolean instersects(Vector v);
+	public abstract Vector closerIntersectionPoint(Ray r) throws RayTracerException;
 	
-	public abstract Vector intersectionPoint(Vector v);
+	public abstract Vector normalAtIntersection(Ray r) throws RayTracerException;
+	
+	public Material getMaterial()
+	{
+		return new Material(material);
+	}
 }

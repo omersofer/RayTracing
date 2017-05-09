@@ -38,6 +38,21 @@ public class Material
 		transparencyCoeff = trans_coeff;
 	}
 	
+	public Material(Material m)
+	{
+		this(m.diffuseColor[R],
+				m.diffuseColor[G],
+				m.diffuseColor[B],
+				m.specularColor[R],
+				m.specularColor[G],
+				m.specularColor[B],
+				m.specularityCoeff,
+				m.reflectionColor[R],
+				m.reflectionColor[G],
+				m.reflectionColor[B],
+				m.transparencyCoeff);
+	}
+	
 	public byte[] getDiffuseColor() {
 		byte[] copy = new byte[3];
 		System.arraycopy(diffuseColor, 0, copy, 0, diffuseColor.length);

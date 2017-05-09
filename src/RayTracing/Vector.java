@@ -58,15 +58,53 @@ public class Vector {
 		z = z / n;
 	}
 	
-	public static Vector toUnit(Vector v)
+	/**
+	 * Doesn't change original Vector
+	 * @return new Vector with magnitude 1.0
+	 */
+	public Vector toUnit()
 	{
-		Vector u = new Vector(v);
+		Vector u = new Vector(this);
 		u.normalize();
 		return u;
 	}
 	
+	public static Vector add(Vector u, Vector v)
+	{
+		return new Vector(u.x + v.x,
+				u.y + v.y,
+				u.z + v.z);
+	}
+	
+	public Vector add(Vector v)
+	{
+		return add(this, v);
+	}
+	
+	public static Vector substract(Vector u, Vector v)
+	{
+		return new Vector(u.x - v.x,
+				u.y - v.y,
+				u.z - v.z);
+	}
+	
+	public Vector substract(Vector v)
+	{
+		return substract(this, v);
+	}
+	
+	/**
+	 * @param d - lengthening factor.
+	 * @return new Vector longer by factor d than original Vector.
+	 */
+	public Vector times(double d)
+	{
+		return new Vector(this.x * d,
+				this.y * d, this.z * d);
+	}
+	
 	 @Override
     public String toString(){
-        return String.format("v(%f,%f,%f)", x, y, z);
+        return String.format("v(%.2f,%.2f,%.2f)", x, y, z);
     }
 }
