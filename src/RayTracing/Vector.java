@@ -6,6 +6,12 @@ public class Vector {
 	double y;
 	double z;
 	
+	/**
+	 * ctor
+	 * @param x
+	 * @param y
+	 * @param z
+	 */
 	public Vector(double x, double y, double z)
 	{
 		this.x = x;
@@ -13,6 +19,10 @@ public class Vector {
 		this.z = z;
 	}
 	
+	/**
+	 * copy ctor
+	 * @param v - other vector
+	 */
 	public Vector(Vector v)
 	{
 		this.x = v.x;

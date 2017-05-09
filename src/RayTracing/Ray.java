@@ -7,7 +7,7 @@ public class Ray {
 
 	public Ray(Vector origin, Vector vector)
 	{
-		this.origin = origin;
+		this.origin = new Vector(origin);
 		this.vector = vector.toUnit();
 	}
 	

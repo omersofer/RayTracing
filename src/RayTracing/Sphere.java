@@ -10,7 +10,7 @@ public class Sphere extends Primitive {
 	public Sphere(Material material, Vector origin, double radius)
 	{
 		super(material);
-		this.origin = origin;
+		this.origin = new Vector(origin);
 		this.radius = radius;
 	}
 

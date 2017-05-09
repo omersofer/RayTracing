@@ -25,18 +25,18 @@ public class RayTracer
 
 	public static void main(String[] args)
 	{
-		sphereTest();
+		primitiveTest();
 	}
 	
-	public static void sphereTest()
+	public static void primitiveTest()
 	{
 		Sphere s = new Sphere(null, new Vector(5,5,5), 1);
-		Ray r = new Ray(new Vector(5,0,0), new Vector(0,1,1));
-		
+		Ray r = new Ray(new Vector(0,0,0), new Vector(1,1,1));
+		Triangle tr = new Triangle(null, new Vector(-2,0,0), new Vector(0,-2,0), new Vector(1,1,10));
 		try
 		{
-			Vector intersection = s.closerIntersectionPoint(r);
-			System.out.println("intersention of " + s + " and " + r + " is " + intersection);			
+			Vector intersection = tr.closerIntersectionPoint(r);
+			System.out.println("intersention of " + tr + " and " + r + " is " + intersection);			
 		}
 		catch (RayTracerException e)
 		{
