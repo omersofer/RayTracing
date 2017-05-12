@@ -91,15 +91,15 @@ public class Set {
 	}
 	
 
-	public Color getColorAtIntersectionOfRay(Ray ray) 
+	public Color getColorAtIntersectionOfRay(Ray ray, int depth) 
 	{
 		Vector closest_intersection = null;
 		Primitive closest_primitive = null;
-		
 		ArrayList<Primitive> all_primitives = new ArrayList<>();
 		all_primitives.addAll(spheres);
 		all_primitives.addAll(planes);
 		all_primitives.addAll(triangles);
+		
 		// FIXME: doesn't account for hitting lights!
 		for (Primitive primitive : all_primitives)
 		{
@@ -141,9 +141,9 @@ public class Set {
 		Color colorAtIntersection = this.bgcolor;
 		if (closest_intersection != null)
 		{
-			colorAtIntersection = getColorAtIntersection(closest_primitive, closest_intersection);
+			colorAtIntersection = getColorAtIntersection(closest_primitive, ray, closest_intersection);
 		}
-		
+		colorAtIntersection.trim();
 		return colorAtIntersection;
 	}
 	
@@ -152,10 +152,71 @@ public class Set {
 		return new Color(bgcolor);
 	}
 	
-	private Color getColorAtIntersection(Primitive closest_primitive, Vector closest_intersection) 
+	private Color getColorAtIntersection(Primitive primitive, Ray inRay, Vector intersection) 
 	{
 		// FIXME
-		return closest_primitive.getMaterial().getDiffuseColor();
+		Color color = new Color(0,0,0);
+		Color K_d = primitive.getMaterial().getDiffuseColor();
+		for (Light lit : lights)
+		{
+			try
+			{
+				Vector L = lit.getOrigin().substract(intersection);
+				Vector N = primitive.normalAtIntersection(inRay);
+				
+				//-- go back a little:
+				Vector go_back_a_little = new Vector(intersection.substract(inRay.getVector().timesScalar(0.05)));
+				Ray r = new Ray(go_back_a_little, L);
+				if (firstHit(r, lit))
+				{
+					Color I_p = lit.getColor();
+					double factor = N.dotProduct(L);
+					color = color.add(K_d.multiply(I_p).scalarMultipy(factor));
+				}
+			}
+			catch (RayTracerException e)
+			{
+				e.printStackTrace();
+				continue;
+			}
+		}
+		return color;
+	}
+
+	private boolean firstHit(Ray r, Light lit) 
+	{
+		ArrayList<Primitive> all_primitives = new ArrayList<>();
+		all_primitives.addAll(spheres);
+		all_primitives.addAll(planes);
+		all_primitives.addAll(triangles);
+		
+		for (Primitive primitive : all_primitives)
+		{
+			try 
+			{
+				Vector in = primitive.closerIntersectionPoint(r);
+				if (in == null)
+				{
+					continue;
+				}
+				else
+				{
+					double lengthToPrimitive = in.substract(r.getOrigin()).magnitude();
+					double lengthToLight = lit.getOrigin().substract(r.getOrigin()).magnitude();
+					if (lengthToPrimitive < lengthToLight)
+					{
+						return false;
+					}					
+				}
+			} 
+			catch (RayTracerException e) 
+			{
+				System.out.println("firstHit: exception");
+				e.printStackTrace();
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override

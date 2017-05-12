@@ -83,7 +83,6 @@ public class Camera {
 		
 		Vector vOfRay = P.substract(position).toUnit();
 		Ray ray = new Ray(this.position, vOfRay);
-		//System.out.println(String.format("Pixel (%d,%d) Ray %s", i, j, ray));
 		return ray;
 	}
 

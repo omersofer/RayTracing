@@ -195,7 +195,7 @@ public class RayTracer
 		// Create a byte array to hold the pixel data:
 		byte[] rgbData = new byte[this.imageWidth * this.imageHeight * 3];
 
-		ThreadPool tracers = new ThreadPool(10, rgbData, set, cam);
+		ThreadPool tracers = new ThreadPool(20, rgbData, set, cam);
 		tracers.render(imageHeight, imageWidth);
         
 		

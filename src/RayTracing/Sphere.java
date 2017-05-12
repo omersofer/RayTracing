@@ -20,6 +20,7 @@ public class Sphere extends Primitive {
 		{
 			// means ray's origin inside sphere!
 			throw new RayTracerException("Unsupported Intersection calculation: Ray starts inside sphere");
+			//return null;
 		}
 		
 		Vector L = origin.substract(r.getOrigin());

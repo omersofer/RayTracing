@@ -17,14 +17,24 @@ public class Color {
 		this(otherColor.getR(), otherColor.getG(), otherColor.getB());
 	}
 	
-	public void add(Color otherColor)
+	public Color(Vector c)
 	{
-		rgb = rgb.add(otherColor.rgb);
+		this(c.x, c.y, c.z);
 	}
 	
-	public void multiply(Color otherColor)
+	public Color add(Color otherColor)
 	{
-		rgb = rgb.timesVector(otherColor.rgb);
+		return new Color(rgb.add(otherColor.rgb));
+	}
+	
+	public Color multiply(Color otherColor)
+	{
+		return new Color(rgb.timesVector(otherColor.rgb));
+	}
+	
+	public Color scalarMultipy(double factor)
+	{
+		return new Color(rgb.timesScalar(factor));
 	}
 	
 	public void trim()

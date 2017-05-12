@@ -18,10 +18,18 @@ public class Plane extends Primitive {
 	{
 		double t = - (r.getOrigin().dotProduct(normal) + d) 
 				/ (r.getVector().dotProduct(normal));
-		Vector P = r.getOrigin().add(r.getUnitTimes(t));
-		return P;
+		if (t < 0)
+		{
+			return null;
+		}
+		else
+		{
+			Vector P = r.getOrigin().add(r.getUnitTimes(t));
+			return P;
+		}
 	}
 
+	
 	@Override
 	public Vector normalAtIntersection(Ray r) throws RayTracerException {
 		// FIXME: 	in here we might want to return (-normal) sometimes

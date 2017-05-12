@@ -42,7 +42,7 @@ public class WorkerThread implements Runnable {
 
     private Color rayTrace(Ray ray) 
     {
-		Color col = set.getColorAtIntersectionOfRay(ray);
+		Color col = set.getColorAtIntersectionOfRay(ray, 0);
 		return col;
 	}
 

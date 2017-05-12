@@ -26,14 +26,14 @@ public class ThreadPool {
         	for (int j = 0; j < numCols; j++)
         	{
         		Runnable worker = new WorkerThread(i, j, rgbData, set, cam);
-        		worker.run();
-        		//executor.execute(worker);        		
+        		//worker.run();
+        		executor.execute(worker);        		
         	}
         }
-//        executor.shutdown();
-//        while (!executor.isTerminated()) 
-//        {
-//        }
+        executor.shutdown();
+        while (!executor.isTerminated()) 
+        {
+        }
         System.out.println("Finished all threads. Printing resulting image:\n");
     }
 }

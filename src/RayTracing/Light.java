@@ -41,4 +41,13 @@ public class Light {
 				new Color(color_r, color_g, color_b),
 				spec_intensity, shadow_intensity, radius);
 	}
+
+	public Vector getOrigin() 
+	{
+		return new Vector(origin);
+	}
+
+	public Color getColor() {
+		return new Color(color);
+	}
 }
