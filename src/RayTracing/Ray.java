@@ -9,6 +9,10 @@ public class Ray {
 	{
 		this.origin = new Vector(origin);
 		this.vector = vector.toUnit();
+		if (vector.z < 0)
+		{
+			System.out.println("Ray looking backwards was created!");
+		}
 	}
 	
 	public Vector getOrigin()

@@ -120,6 +120,21 @@ public class Vector {
 				this.z * v.z);
 	}
 	
+	public double getX()
+	{
+		return x;
+	}
+	
+	public double getY()
+	{
+		return y;
+	}
+	
+	public double getZ()
+	{
+		return z;
+	}
+	
 	 @Override
     public String toString(){
         return String.format("v(%.2f,%.2f,%.2f)", x, y, z);

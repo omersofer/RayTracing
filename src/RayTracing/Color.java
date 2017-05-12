@@ -48,5 +48,10 @@ public class Color {
 	{
 		return rgb.z;
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("rgb(%.2f,%.2f,%.2f)", rgb.x, rgb.y, rgb.z);
+	}
 
 }

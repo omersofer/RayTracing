@@ -8,8 +8,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -40,56 +38,6 @@ public class RayTracer
 		System.out.println("Working Directory = " + System.getProperty("user.dir"));
 		//primitiveTest();
 		main_finalMain(args); 
-	}
-	
-	public static void primitiveTest()
-	{
-		Sphere s = new Sphere(null, new Vector(5,5,5), 1);
-		Ray r = new Ray(new Vector(0,0,0), new Vector(1,1,1));
-		Triangle tr = new Triangle(null, new Vector(-2,0,0), new Vector(0,-2,0), new Vector(1,1,10));
-		try
-		{
-			Vector intersection = tr.closerIntersectionPoint(r);
-			System.out.println("intersention of " + tr + " and " + r + " is " + intersection);			
-		}
-		catch (RayTracerException e)
-		{
-			System.out.println("Failed");
-		}
-	}
-	
-	public static void vectorTest(String[] args)
-	{
-		Vector u = new Vector(3, 4, 6);
-		Vector v = new Vector(7, 0, -4);
-		System.out.println( "u is " + u + " and v is " + v);
-		System.out.println( "u magn is " + u.magnitude() + " and v magn is " + v.magnitude());
-		
-		Vector n = u.crossProduct(v);
-		System.out.println("Cross product is " + n);
-		
-		double prd = u.dotProduct(v);
-		System.out.println("Dot product is " + prd);
-		
-		u.normalize();
-		v.normalize();
-		System.out.println( "u is " + u + " and v is " + v);
-		System.out.println( "u magn is " + u.magnitude() + " and v magn is " + v.magnitude());
-	}
-	
-	public static void threadTest(String[] args)
-	{
-		long startTime = System.nanoTime();
-		
-		int numRows = 20;
-		int numCols = 20;
-		int numOfWorkers = 10;
-		int[][] pixels = new int[numRows][numCols];
-		ThreadPool rayTracingJobs = new ThreadPool(numOfWorkers, pixels);
-		rayTracingJobs.render(numRows, numCols);
-		
-		System.out.printf("Made %d calculations, ~0.5 sec each. Elapsed Time = %,d msecs",
-				numRows * numCols, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime)); 
 	}
 	
 	/**
@@ -165,7 +113,7 @@ public class RayTracer
 				if (code.equals("cam"))
 				{
                     // Add code here to parse camera parameters
-					cam = Camera.parseCamera(params);
+					cam = Camera.parseCamera(params, imageWidth, imageHeight);
 					System.out.println(String.format("Parsed camera parameters (line %d) - " + cam, lineNum));
 				}
 				else if (code.equals("set"))
@@ -232,12 +180,9 @@ public class RayTracer
 				}
 			}
 		}
-
         // It is recommended that you check here that the scene is valid,
         // for example camera settings and all necessary materials were defined.
-
 		System.out.println("Finished parsing scene file " + sceneFileName);
-		
 	}
 
 	/**
@@ -250,8 +195,11 @@ public class RayTracer
 		// Create a byte array to hold the pixel data:
 		byte[] rgbData = new byte[this.imageWidth * this.imageHeight * 3];
 
-
-        // Put your ray tracing code here!
+		ThreadPool tracers = new ThreadPool(10, rgbData, set, cam);
+		tracers.render(imageHeight, imageWidth);
+        
+		
+		// Put your ray tracing code here!
         //
         // Write pixel color values in RGB format to rgbData:
         // Pixel [x, y] red component is in rgbData[(y * this.imageWidth + x) * 3]
@@ -274,7 +222,50 @@ public class RayTracer
 		System.out.println("Saved file " + outputFileName);
 	}
 
-	//////////////////////// FUNCTIONS TO SAVE IMAGES IN PNG FORMAT //////////////////////////////////////////
+	
+	/************************************
+	 * 				Tests				*
+	 ************************************/
+
+	public static void primitiveTest()
+	{
+		Sphere s = new Sphere(null, new Vector(5,5,5), 1);
+		Ray r = new Ray(new Vector(0,0,0), new Vector(1,1,1));
+		Triangle tr = new Triangle(null, new Vector(-2,0,0), new Vector(0,-2,0), new Vector(1,1,10));
+		try
+		{
+			Vector intersection = tr.closerIntersectionPoint(r);
+			System.out.println("intersention of " + tr + " and " + r + " is " + intersection);			
+		}
+		catch (RayTracerException e)
+		{
+			System.out.println("Failed");
+		}
+	}
+	
+	public static void vectorTest(String[] args)
+	{
+		Vector u = new Vector(3, 4, 6);
+		Vector v = new Vector(7, 0, -4);
+		System.out.println( "u is " + u + " and v is " + v);
+		System.out.println( "u magn is " + u.magnitude() + " and v magn is " + v.magnitude());
+		
+		Vector n = u.crossProduct(v);
+		System.out.println("Cross product is " + n);
+		
+		double prd = u.dotProduct(v);
+		System.out.println("Dot product is " + prd);
+		
+		u.normalize();
+		v.normalize();
+		System.out.println( "u is " + u + " and v is " + v);
+		System.out.println( "u magn is " + u.magnitude() + " and v magn is " + v.magnitude());
+	}
+
+	
+	/********************************************
+	 * 	FUNCTIONS TO SAVE IMAGES IN PNG FORMAT	*
+	 ********************************************/
 
 	/*
 	 * Saves RGB data as an image in png format to the specified location.

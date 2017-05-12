@@ -16,7 +16,6 @@ public class Sphere extends Primitive {
 
 	public Vector[] instersections(Ray r) throws RayTracerException 
 	{
-		
 		if (origin.substract(r.getOrigin()).magnitude() < radius)
 		{
 			// means ray's origin inside sphere!
@@ -47,7 +46,9 @@ public class Sphere extends Primitive {
 	public Vector closerIntersectionPoint(Ray r) throws RayTracerException
 	{
 		Vector[] intersections = this.instersections(r);
-		if (intersections[0] == null && intersections[1] == null)
+		if (intersections == null)
+			return null;
+		else if (intersections[0] == null && intersections[1] == null)
 		{
 			return null;
 		}

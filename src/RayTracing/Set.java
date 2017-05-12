@@ -1,10 +1,13 @@
 package RayTracing;
 
+import java.security.AllPermission;
 import java.util.ArrayList;
+
+import RayTracing.RayTracer.RayTracerException;
 
 public class Set {
 	
-	private double[] bgcolor;
+	private Color bgcolor;
 	private int num_of_shadow_rays;
 	private int max_recursion_lvl;
 	private int super_sampling_lvl;
@@ -18,10 +21,7 @@ public class Set {
 	public Set(double bg_r, double bg_g, double bg_b,
 			int shadow_rays, int rec_lvl, int sampl_lvl)
 	{
-		bgcolor = new double[3];
-		bgcolor[0] = bg_r;
-		bgcolor[1] = bg_g;
-		bgcolor[2] = bg_b;
+		bgcolor = new Color(bg_r, bg_g, bg_b);
 		
 		num_of_shadow_rays = shadow_rays;
 		max_recursion_lvl = rec_lvl;
@@ -90,11 +90,80 @@ public class Set {
 		return !materials.isEmpty();
 	}
 	
+
+	public Color getColorAtIntersectionOfRay(Ray ray) 
+	{
+		Vector closest_intersection = null;
+		Primitive closest_primitive = null;
+		
+		ArrayList<Primitive> all_primitives = new ArrayList<>();
+		all_primitives.addAll(spheres);
+		all_primitives.addAll(planes);
+		all_primitives.addAll(triangles);
+		// FIXME: doesn't account for hitting lights!
+		for (Primitive primitive : all_primitives)
+		{
+			try 
+			{
+				Vector curr_intsc = primitive.closerIntersectionPoint(ray);
+				if (curr_intsc == null)
+				{
+					continue;					
+				}
+				else
+				{
+					if (closest_intersection != null)
+					{
+						//System.out.println("for ray " + ray + " intersection was not null!");
+						double currMinLength = closest_intersection.substract(ray.getOrigin()).magnitude();
+						double thisLength = curr_intsc.substract(ray.getOrigin()).magnitude();
+						if (thisLength < currMinLength)
+						{
+							closest_primitive = primitive;
+							closest_intersection = curr_intsc;
+						}
+					}
+					else
+					{
+						// first intersection
+						closest_intersection = curr_intsc;
+						closest_primitive = primitive;
+					}
+				}
+			}
+			catch (RayTracerException e) 
+			{
+				System.out.println("Caught exception, camera inside sphere");
+				e.printStackTrace();
+			}
+		}
+
+		Color colorAtIntersection = this.bgcolor;
+		if (closest_intersection != null)
+		{
+			colorAtIntersection = getColorAtIntersection(closest_primitive, closest_intersection);
+		}
+		
+		return colorAtIntersection;
+	}
+	
+	public Color getBGColor()
+	{
+		return new Color(bgcolor);
+	}
+	
+	private Color getColorAtIntersection(Primitive closest_primitive, Vector closest_intersection) 
+	{
+		// FIXME
+		return closest_primitive.getMaterial().getDiffuseColor();
+	}
+
 	@Override
 	public String toString() {
-		return String.format("Set(rgb(%.2f,%.2f,%.2f), shadow(%d), rec(%d), sampl(%d))", bgcolor[0],  bgcolor[1], bgcolor[2],
+		return String.format("Set(%s, shadow(%d), rec(%d), sampl(%d))", bgcolor,
 				num_of_shadow_rays,  max_recursion_lvl,  super_sampling_lvl);
 	}
+
 
 	
 	
