@@ -66,4 +66,29 @@ public class Triangle extends Primitive {
 	public String toString() {
 		return "Tr(" + T1 + ", " + T2 + ", " + T3 +")";
 	}
+
+	public static Triangle parseTriangle(String[] params, Set set) throws RayTracerException 
+	{
+		double px1 = Double.parseDouble(params[0+0]);
+		double py1 = Double.parseDouble(params[1+0]);
+		double pz1 = Double.parseDouble(params[2+0]);
+		
+		double px2 = Double.parseDouble(params[0+3]);
+		double py2 = Double.parseDouble(params[1+3]);
+		double pz2 = Double.parseDouble(params[2+3]);
+		
+		double px3 = Double.parseDouble(params[0+6]);
+		double py3 = Double.parseDouble(params[1+6]);
+		double pz3 = Double.parseDouble(params[2+6]);
+		
+		int matInx = Integer.parseInt(params[9]); 
+		
+		Material m = set.getMaterial(matInx);
+		if (m != null)
+			return new Triangle(m, new Vector(px1,py1,pz1),
+					new Vector(px2, py2, pz2),
+					new Vector(px3, py3, pz3));
+		else
+			throw new RayTracerException("Triangle material index error!");
+	}
 }

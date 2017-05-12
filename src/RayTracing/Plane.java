@@ -34,4 +34,20 @@ public class Plane extends Primitive {
 		return "Pln(" + normal + ", " + d +")";
 	}
 
+	public static Plane parsePlane(String[] params, Set set) throws RayTracerException 
+	{
+		double nx = Double.parseDouble(params[0]);
+		double ny = Double.parseDouble(params[1]);
+		double nz = Double.parseDouble(params[2]);
+		
+		double offs = Double.parseDouble(params[3]);
+		int matInx = Integer.parseInt(params[4]); 
+		
+		Material m = set.getMaterial(matInx);
+		if (m != null)
+			return new Plane(m, new Vector(nx,ny,nz), offs);
+		else
+			throw new RayTracerException("Plane material index error!");
+	}
+
 }

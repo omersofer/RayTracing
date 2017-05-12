@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -22,6 +24,16 @@ public class RayTracer
 
 	public int imageWidth;
 	public int imageHeight;
+	
+	private Set set;
+	private Camera cam;
+	
+	public RayTracer()
+	{
+		// Default values:
+		imageWidth = 500;
+		imageHeight = 500;
+	}
 
 	public static void main(String[] args)
 	{
@@ -89,10 +101,6 @@ public class RayTracer
 		{
 			RayTracer tracer = new RayTracer();
 
-            // Default values:
-			tracer.imageWidth = 500;
-			tracer.imageHeight = 500;
-
 			if (args.length < 2)
 				throw new RayTracerException("Not enough arguments provided. Please specify an input scene file and an output image file for rendering.");
 
@@ -136,8 +144,9 @@ public class RayTracer
 		int lineNum = 0;
 		System.out.println("Started parsing scene file " + sceneFileName);
 
-		Set set;
-		Camera cam;
+		set = null;
+		cam = null;
+		
 		while ((line = r.readLine()) != null)
 		{
 			line = line.trim();
@@ -168,37 +177,53 @@ public class RayTracer
 				else if (code.equals("mtl"))
 				{
                     // Add code here to parse material parameters
-
+					if (set == null)
+						throw new RayTracerException("set should have been parsed before material!"); //maybe support later.
+					
+					Material parsedMat = Material.parseMaterial(params);
+					set.addMaterial(parsedMat);
 					System.out.println(String.format("Parsed material (line %d)", lineNum));
 				}
 				else if (code.equals("sph"))
 				{
-                    // Add code here to parse sphere parameters
-
-                    // Example (you can implement this in many different ways!):
-                    // Sphere sphere = new Sphere();
-                    // sphere.setCenter(params[0], params[1], params[2]);
-                    // sphere.setRadius(params[3]);
-                    // sphere.setMaterial(params[4]);
-
-					System.out.println(String.format("Parsed sphere (line %d)", lineNum));
+					if (set == null) 
+						throw new RayTracerException("set should have been parsed before sphere!"); //maybe support later.
+					if (!set.hasMaterial())
+						throw new RayTracerException("A material should have been parsed before sphere!");
+					
+					Sphere sphere = Sphere.parseSphere(params, set);
+					set.addSphere(sphere);
+					System.out.println(String.format("Parsed sphere (line %d)" + sphere, lineNum));
 				}
 				else if (code.equals("pln"))
 				{
-                    // Add code here to parse plane parameters
-
+					if (set == null) 
+						throw new RayTracerException("set should have been parsed before sphere!"); //maybe support later.
+					if (!set.hasMaterial())
+						throw new RayTracerException("A material should have been parsed before sphere!");
+					
+					Plane plane = Plane.parsePlane(params, set);
+					set.addPlane(plane);
 					System.out.println(String.format("Parsed plane (line %d)", lineNum));
 				}
 				else if (code.equals("trg"))
 				{
-                    // Add code here to parse cylinder parameters
-
+					if (set == null) 
+						throw new RayTracerException("set should have been parsed before triangle!"); //maybe support later.
+					if (!set.hasMaterial())
+						throw new RayTracerException("A material should have been parsed before triangle!");
+					
+					Triangle trngl = Triangle.parseTriangle(params, set);
+					set.addTriangle(trngl);
 					System.out.println(String.format("Parsed cylinder (line %d)", lineNum));
 				}
 				else if (code.equals("lgt"))
 				{
-                    // Add code here to parse light parameters
-
+					if (set == null) 
+						throw new RayTracerException("set should have been parsed before light!"); //maybe support later.
+					
+					Light lit = Light.parseLight(params, set);
+					set.addLight(lit);
 					System.out.println(String.format("Parsed light (line %d)", lineNum));
 				}
 				else
@@ -212,6 +237,7 @@ public class RayTracer
         // for example camera settings and all necessary materials were defined.
 
 		System.out.println("Finished parsing scene file " + sceneFileName);
+		
 	}
 
 	/**

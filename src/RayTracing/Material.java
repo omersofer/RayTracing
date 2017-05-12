@@ -2,74 +2,97 @@ package RayTracing;
 
 public class Material 
 {
+	private static int static_matIndex = 1;
+	
 	public final static int R = 0;
 	public final static int G = 1;
 	public final static int B = 2;
 	
-	private double[] diffuseColor;
-	private double[] specularColor;
+	private int matInx;
+	private Color diffuseColor;
+	private Color specularColor;
 	private double specularityCoeff;
-	private double[] reflectionColor;
+	private Color reflectionColor;
 	private double transparencyCoeff;
 	
 	
-	public Material(double diff_r, double diff_g, double diff_b,
+	public Material(int matIndex, double diff_r, double diff_g, double diff_b,
 			double spec_r, double spec_g, double spec_b,
 			double spec_coeff,
 			double refl_r, double refl_g, double refl_b,
 			double trans_coeff)
 	{
-		diffuseColor = new double[3];
-		diffuseColor[R] = diff_r;
-		diffuseColor[G] = diff_g;
-		diffuseColor[B] = diff_b;
-		
-		specularColor = new double[3];
-		specularColor[R] = spec_r;
-	    specularColor[G] = spec_g;
-		specularColor[B] = spec_b;
-		
+		matInx = matIndex;
+		diffuseColor = new Color(diff_r, diff_g, diff_b);
+		specularColor = new Color(spec_r, spec_g, spec_b);
 		specularityCoeff = spec_coeff;
-		
-		reflectionColor[R] = refl_r;
-		reflectionColor[G] = refl_g;
-		reflectionColor[B] = refl_b;
-		
+		reflectionColor = new Color(refl_r, refl_g,refl_b);
 		transparencyCoeff = trans_coeff;
 	}
 	
 	public Material(Material m)
 	{
-		this(m.diffuseColor[R],
-				m.diffuseColor[G],
-				m.diffuseColor[B],
-				m.specularColor[R],
-				m.specularColor[G],
-				m.specularColor[B],
+		this(m.matInx,
+				m.diffuseColor.getR(),
+				m.diffuseColor.getG(),
+				m.diffuseColor.getB(),
+				m.specularColor.getR(),
+				m.specularColor.getG(),
+				m.specularColor.getB(),
 				m.specularityCoeff,
-				m.reflectionColor[R],
-				m.reflectionColor[G],
-				m.reflectionColor[B],
+				m.reflectionColor.getR(),
+				m.reflectionColor.getG(),
+				m.reflectionColor.getB(),
 				m.transparencyCoeff);
 	}
 	
-	public double[] getDiffuseColor() {
-		double[] copy = new double[3];
-		System.arraycopy(diffuseColor, 0, copy, 0, diffuseColor.length);
-		return copy;
+	public Color getDiffuseColor() {
+		return new Color(diffuseColor);
 	}
-	public double[] getSpecularColor() {
-		return specularColor;
+	
+	public Color getSpecularColor() {
+		return new Color(specularColor);
 	}
+	
 	public double getSpecularityCoeff() {
 		return specularityCoeff;
 	}
-	public double[] getReflectionColor() {
-		return reflectionColor;
+	
+	public Color getReflectionColor() {
+		return new Color(reflectionColor);
 	}
+	
 	public double getTransparencyCoeff() {
 		return transparencyCoeff;
 	}
 	
+	public int getMaterialIndex()
+	{
+		return matInx;
+	}
+
+	public static Material parseMaterial(String[] params) 
+	{
+		double diff_r = Double.parseDouble(params[0]);
+		double diff_g = Double.parseDouble(params[1]);
+		double diff_b = Double.parseDouble(params[2]);
+		
+		double spec_r = Double.parseDouble(params[3]);
+		double spec_g = Double.parseDouble(params[4]);
+		double spec_b = Double.parseDouble(params[5]);
+		
+		double refl_r = Double.parseDouble(params[6]);
+		double refl_g = Double.parseDouble(params[7]);
+		double refl_b = Double.parseDouble(params[8]);
+		
+		double spec_coeff = Double.parseDouble(params[9]);
+		double trans_coeff = Double.parseDouble(params[10]);
+		
+		return new Material(static_matIndex++, diff_r, diff_g, diff_b,
+				spec_r, spec_g, spec_b,
+				spec_coeff,
+				refl_r, refl_g, refl_b,
+				trans_coeff);
+	}
 	
 }

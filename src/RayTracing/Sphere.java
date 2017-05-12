@@ -77,7 +77,21 @@ public class Sphere extends Primitive {
 	public String toString() {
 		return "s(" + origin + ", " + radius + ")";
 	}
-	
-	
+
+	public static Sphere parseSphere(String[] params, Set set) throws RayTracerException 
+	{
+		double px = Double.parseDouble(params[0]);
+		double py = Double.parseDouble(params[1]);
+		double pz = Double.parseDouble(params[2]);
+		
+		double rd = Double.parseDouble(params[3]);
+		int matInx = Integer.parseInt(params[4]); 
+		
+		Material m = set.getMaterial(matInx);
+		if (m != null)
+			return new Sphere(m, new Vector(px,py,pz), rd);
+		else
+			throw new RayTracerException("Sphere material index error!");
+	}
 
 }

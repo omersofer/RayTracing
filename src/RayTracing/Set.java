@@ -9,6 +9,7 @@ public class Set {
 	private int max_recursion_lvl;
 	private int super_sampling_lvl;
 	
+	private ArrayList<Material> materials;
 	private ArrayList<Light> lights;
 	private ArrayList<Sphere> spheres;
 	private ArrayList<Plane> planes;
@@ -26,6 +27,7 @@ public class Set {
 		max_recursion_lvl = rec_lvl;
 		super_sampling_lvl = sampl_lvl;
 		
+		materials = new ArrayList<>();
 		lights = new ArrayList<>();
 		spheres = new ArrayList<>();
 		planes = new ArrayList<>();
@@ -48,9 +50,52 @@ public class Set {
 				 shadow_rays,  rec_lvl,  sampl_lvl);
 	}
 	
+	public void addMaterial(Material mat)
+	{
+		materials.add(mat);
+	}
+	
+	public void addLight(Light lit)
+	{
+		lights.add(lit);
+	}
+	
+	public void addSphere(Sphere sph)
+	{
+		spheres.add(sph);
+	}
+	
+	public void addPlane(Plane pln)
+	{
+		planes.add(pln);
+	}
+	
+	public void addTriangle(Triangle trng)
+	{
+		triangles.add(trng);
+	}
+	
+	public Material getMaterial(int matInx) 
+	{
+		for (Material m : materials)
+		{
+			if (m.getMaterialIndex() == matInx)
+				return new Material(m);
+		}
+		return null;
+	}
+	
+	public boolean hasMaterial()
+	{
+		return !materials.isEmpty();
+	}
+	
 	@Override
 	public String toString() {
 		return String.format("Set(rgb(%.2f,%.2f,%.2f), shadow(%d), rec(%d), sampl(%d))", bgcolor[0],  bgcolor[1], bgcolor[2],
 				num_of_shadow_rays,  max_recursion_lvl,  super_sampling_lvl);
 	}
+
+	
+	
 }
