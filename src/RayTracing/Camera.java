@@ -82,7 +82,7 @@ public class Camera {
 				v.timesScalar(0.5 * screen_height / numOfRows));
 		
 		Vector vOfRay = P.substract(position).toUnit();
-		Ray ray = new Ray(this.position, vOfRay);
+		Ray ray = new Ray(this.position, vOfRay); //TODO: check maybe ray's origin is P.
 		return ray;
 	}
 

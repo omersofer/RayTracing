@@ -1,6 +1,5 @@
 package RayTracing;
 
-import java.security.AllPermission;
 import java.util.ArrayList;
 
 import RayTracing.RayTracer.RayTracerException;
@@ -161,11 +160,12 @@ public class Set {
 		{
 			try
 			{
-				Vector L = lit.getOrigin().substract(intersection);
-				Vector N = primitive.normalAtIntersection(inRay);
-				
 				//-- go back a little:
 				Vector go_back_a_little = new Vector(intersection.substract(inRay.getVector().timesScalar(0.05)));
+
+				Vector L = lit.getOrigin().substract(go_back_a_little);
+				Vector N = primitive.normalAtIntersection(inRay);
+				
 				Ray r = new Ray(go_back_a_little, L);
 				if (firstHit(r, lit))
 				{
