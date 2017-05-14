@@ -118,8 +118,8 @@ public class Set {
 						double thisLength = curr_intsc.substract(ray.getOrigin()).magnitude();
 						if (thisLength < currMinLength)
 						{
-							closest_primitive = primitive;
 							closest_intersection = curr_intsc;
+							closest_primitive = primitive;
 						}
 					}
 					else

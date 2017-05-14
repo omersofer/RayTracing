@@ -18,11 +18,13 @@ public class Sphere extends Primitive {
 	{
 		if (origin.substract(r.getOrigin()).magnitude() < radius)
 		{
+			//TODO: consider supporting this case.
 			// means ray's origin inside sphere!
 			throw new RayTracerException("Unsupported Intersection calculation: Ray starts inside sphere");
 			//return null;
 		}
-		
+
+		//Calculations were took from Dani's presentation.
 		Vector L = origin.substract(r.getOrigin());
 		double t_ca = L.dotProduct(r.getVector());
 		if (t_ca < 0)
@@ -70,7 +72,7 @@ public class Sphere extends Primitive {
 	public Vector normalAtIntersection(Ray r) throws RayTracerException 
 	{
 		Vector P = closerIntersectionPoint(r);
-		Vector N = P.substract(r.getOrigin());
+		Vector N = P.substract(origin);
 		N.normalize();
 		return N;
 	}

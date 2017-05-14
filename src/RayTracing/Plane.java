@@ -16,8 +16,10 @@ public class Plane extends Primitive {
 	@Override
 	public Vector closerIntersectionPoint(Ray r) throws RayTracerException 
 	{
-		double t = - (r.getOrigin().dotProduct(normal) + d) 
-				/ (r.getVector().dotProduct(normal));
+		//Plane equation is: P*N-d = 0.
+		//Ray equation is : P(t) = O + t*V
+		//To find intersection substitute: t = (d-N*O)/(V*N)
+		double t = (d - normal.dotProduct(r.getOrigin())) / (r.getVector().dotProduct(normal));
 		if (t < 0)
 		{
 			return null;
@@ -29,12 +31,30 @@ public class Plane extends Primitive {
 		}
 	}
 
-	
 	@Override
 	public Vector normalAtIntersection(Ray r) throws RayTracerException {
-		// FIXME: 	in here we might want to return (-normal) sometimes
-		// 			depending on the location of r.origin
-		return new Vector(normal);
+		Vector intersection = closerIntersectionPoint(r);
+		if (intersection == null)
+		{
+			return null;
+		}
+		else
+		{
+			//TODO: this is still not understood - check which normal should be returned in each case.
+			Vector a_little_this_way = intersection.add(normal);
+			Vector a_little_that_way = intersection.add(normal.timesScalar(-1));
+			double this_way_dist = a_little_this_way.substract(r.getOrigin()).magnitude();
+			double that_way_dist = a_little_that_way.substract(r.getOrigin()).magnitude();
+			if (this_way_dist < that_way_dist)
+			{
+				return new Vector(normal);
+			}
+			else
+			{
+				return normal.timesScalar(-1);
+
+			}
+		}
 	}
 	
 	@Override

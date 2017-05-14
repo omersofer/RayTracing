@@ -26,7 +26,7 @@ public class Triangle extends Primitive {
 		Vector norm = side_a.crossProduct(side_b).toUnit();
 		
 		// select p on plane as T1
-		double d = - T1.dotProduct(norm);
+		double d = T1.dotProduct(norm);
 		
 		this.pln = new Plane(material, norm, d);
 	}
@@ -59,6 +59,9 @@ public class Triangle extends Primitive {
 
 	@Override
 	public Vector normalAtIntersection(Ray r) throws RayTracerException {
+		if (closerIntersectionPoint(r) == null) {
+			return null;
+		}
 		return pln.normalAtIntersection(r);
 	}
 

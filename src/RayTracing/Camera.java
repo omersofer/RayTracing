@@ -8,6 +8,7 @@ public class Camera {
 	
 	private double screen_distance;
 	private double screen_width;
+	private double screen_height;
 	
 	private int numOfRows;
 	private int numOfCols;
@@ -22,6 +23,8 @@ public class Camera {
 		this.up_vector = up_vector;
 		this.screen_distance = scrn_distance;
 		this.screen_width = scrn_width;
+
+		this.screen_height = this.numOfRows * (this.screen_width / this.numOfCols) ;
 	}
 	
 	public static Camera parseCamera(String[] params, int pw, int ph) 
@@ -57,31 +60,32 @@ public class Camera {
 		// http://web.cse.ohio-state.edu/~shen.94/681/Site/Slides_files/basic_algo.pdf
 		// slide 17:
 		Vector n = position.substract(look_at_point).toUnit();
-		Vector u = n.crossProduct(up_vector).toUnit();
-		Vector v = u.crossProduct(n);
-		
+		Vector u = up_vector.crossProduct(n).toUnit();
+		Vector v = n.crossProduct(u);
+
 		// slide 19:
-		// NOTE: doing a little different because we organize
-		// pixels differently
-		
 		double d = screen_distance;
-		double aspectRatio = numOfRows / numOfCols; // h / w
-		double screen_height = aspectRatio * screen_width;
+		double W = screen_width;
+		double H = screen_height;
+
 		Vector C = position.substract(n.timesScalar(d));
-		
-		//-- here L is top left
+
 		Vector L = C.substract(
-				u.timesScalar(screen_width / 2)).add(
-						v.timesScalar(screen_height / 2));
-		
+				u.timesScalar(W / 2)).substract(
+				v.timesScalar(H / 2));
+
+		//Note: different i,j notations from presentation at link above (slide 19)
 		Vector P = L.add(u.timesScalar(
-				i * screen_width / numOfCols)).substract(
-						v.timesScalar(j * screen_height / numOfRows));
-		
-		P = P.add(u.timesScalar(0.5 * screen_width / numOfCols)).substract(
+				j * W / numOfCols)).add(
+						v.timesScalar(i * H / numOfRows));
+
+		//Basic sampling - ofsset the ray to the center of the pixel
+		P = P.add(u.timesScalar(0.5 * screen_width / numOfCols)).add(
 				v.timesScalar(0.5 * screen_height / numOfRows));
-		
-		Vector vOfRay = P.substract(position).toUnit();
+
+		//TODO: add super sampling here
+
+		Vector vOfRay = P.substract(position);
 		Ray ray = new Ray(this.position, vOfRay); //TODO: check maybe ray's origin is P.
 		return ray;
 	}
@@ -96,6 +100,7 @@ public class Camera {
 		return numOfCols;
 	}
 
+	//DEBUG ONLY. Broken - need to be updated.
 	public void printViewingPlane()
 	{
 		// http://web.cse.ohio-state.edu/~shen.94/681/Site/Slides_files/basic_algo.pdf

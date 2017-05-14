@@ -35,9 +35,9 @@ public class WorkerThread implements Runnable {
     	
     	//-- ray trace
     	Color c = rayTrace(ray);
-    	rgbData[(i*cam.getCols() + j)*3 + 0] = (byte)(c.getR()*255);
-    	rgbData[(i*cam.getCols() + j)*3 + 1] = (byte)(c.getG()*255);
-    	rgbData[(i*cam.getCols() + j)*3 + 2] = (byte)(c.getB()*255);
+    	rgbData[((cam.getRows()-1 - i)*cam.getCols() + (cam.getCols()-1 - j))*3 + 0] = (byte)(c.getR()*255);//(cam.getRows()-1 - i)
+    	rgbData[((cam.getRows()-1 - i)*cam.getCols() + (cam.getCols()-1 - j))*3 + 1] = (byte)(c.getG()*255);//(cam.getRows()-1 - i)
+    	rgbData[((cam.getRows()-1 - i)*cam.getCols() + (cam.getCols()-1 - j))*3 + 2] = (byte)(c.getB()*255);//(cam.getRows()-1 - i)
     }
 
     private Color rayTrace(Ray ray) 
