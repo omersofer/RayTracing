@@ -38,6 +38,8 @@ public class Triangle extends Primitive {
 	public Vector closerIntersectionPoint(Ray r) throws RayTracerException 
 	{
 		Vector p = pln.closerIntersectionPoint(r);
+		if (p == null)
+			return null;
 		Vector v1p = p.substract(T1);
 		
 		Vector v12 = T2.substract(T1).toUnit();
