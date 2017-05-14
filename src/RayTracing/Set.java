@@ -162,7 +162,7 @@ public class Set {
 			try
 			{
 				//-- go back a little:
-				Vector go_back_a_little = new Vector(intersection.substract(inRay.getVector().timesScalar(0.05)));
+				Vector go_back_a_little = new Vector(intersection.substract(inRay.getVector().timesScalar(Math.pow(10, -10))));//TODO: think about the correct timesScalar(?)
 
 				Vector L = lit.getOrigin().substract(go_back_a_little);
 				Vector N = primitive.normalAtIntersection(inRay).toUnit();
