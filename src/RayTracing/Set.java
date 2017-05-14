@@ -94,12 +94,13 @@ public class Set {
 	{
 		Vector closest_intersection = null;
 		Primitive closest_primitive = null;
+		//TODO: compute all_primitives only once somewhere else in the code
 		ArrayList<Primitive> all_primitives = new ArrayList<>();
 		all_primitives.addAll(spheres);
 		all_primitives.addAll(planes);
 		all_primitives.addAll(triangles);
 		
-		// FIXME: doesn't account for hitting lights!
+		// TODO: now doesn't account for hitting lights!
 		for (Primitive primitive : all_primitives)
 		{
 			try 
@@ -153,7 +154,7 @@ public class Set {
 	
 	private Color getColorAtIntersection(Primitive primitive, Ray inRay, Vector intersection) 
 	{
-		// FIXME
+		// TODO: add reflection, specularity, transparancy, soft shadows...
 		Color color = new Color(0,0,0);
 		Color K_d = primitive.getMaterial().getDiffuseColor();
 		for (Light lit : lights)
@@ -164,13 +165,16 @@ public class Set {
 				Vector go_back_a_little = new Vector(intersection.substract(inRay.getVector().timesScalar(0.05)));
 
 				Vector L = lit.getOrigin().substract(go_back_a_little);
-				Vector N = primitive.normalAtIntersection(inRay);
+				Vector N = primitive.normalAtIntersection(inRay).toUnit();
 				
 				Ray r = new Ray(go_back_a_little, L);
 				if (firstHit(r, lit))
 				{
 					Color I_p = lit.getColor();
-					double factor = N.dotProduct(L);
+					double factor = N.dotProduct(L.toUnit());
+					//TODO: think about the correct factor
+					if (factor < 0)
+						factor = 0;
 					color = color.add(K_d.multiply(I_p).scalarMultipy(factor));
 				}
 			}
@@ -185,6 +189,7 @@ public class Set {
 
 	private boolean firstHit(Ray r, Light lit) 
 	{
+		//TODO: compute all_primitives only once somewhere else in the code
 		ArrayList<Primitive> all_primitives = new ArrayList<>();
 		all_primitives.addAll(spheres);
 		all_primitives.addAll(planes);
