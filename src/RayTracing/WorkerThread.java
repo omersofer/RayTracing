@@ -1,5 +1,7 @@
 package RayTracing;
 
+import java.util.ArrayList;
+
 public class WorkerThread implements Runnable {
   
     private int i;
@@ -19,9 +21,7 @@ public class WorkerThread implements Runnable {
 
     @Override
     public void run() {
-        //System.out.println(Thread.currentThread().getName() + " Start. Pixel = (" + i +"," + j + ")");
         renderOnePixel();
-        //System.out.println(Thread.currentThread().getName() + " End.");
     }
     
     /**
@@ -31,19 +31,27 @@ public class WorkerThread implements Runnable {
     {
     	//-- decide about view plane grid
     	//-- and make a ray
-    	Ray ray = cam.constructRayThroughPixel(i,j);
+    	ArrayList<Ray> rays = cam.constructRaysThroughPixel(i,j);
     	
     	//-- ray trace
-    	Color c = rayTrace(ray);
+    	ArrayList<Color> colors = rayTrace(rays);
+    	
+    	Color c = Color.averageColor(colors);
+    	
     	rgbData[((cam.getRows()-1 - i)*cam.getCols() + (cam.getCols()-1 - j))*3 + 0] = (byte)(c.getR()*255);//(cam.getRows()-1 - i)
     	rgbData[((cam.getRows()-1 - i)*cam.getCols() + (cam.getCols()-1 - j))*3 + 1] = (byte)(c.getG()*255);//(cam.getRows()-1 - i)
     	rgbData[((cam.getRows()-1 - i)*cam.getCols() + (cam.getCols()-1 - j))*3 + 2] = (byte)(c.getB()*255);//(cam.getRows()-1 - i)
     }
 
-    private Color rayTrace(Ray ray) 
+    private ArrayList<Color> rayTrace(ArrayList<Ray> rays) 
     {
-		Color col = set.getColorAtIntersectionOfRay(ray, 0);
-		return col;
+    	ArrayList<Color> colors = new ArrayList<>();
+    	for (Ray ray : rays)
+    	{
+    		Color col = set.getColorAtIntersectionOfRay(ray, 0);
+    		colors.add(col);
+    	}
+		return colors;
 	}
 
 	@Override

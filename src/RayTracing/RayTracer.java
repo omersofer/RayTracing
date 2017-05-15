@@ -183,7 +183,9 @@ public class RayTracer
         // It is recommended that you check here that the scene is valid,
         // for example camera settings and all necessary materials were defined.
 		System.out.println("Finished parsing scene file " + sceneFileName);
+		set.formAllPrimitivesList();
 	}
+
 
 	/**
 	 * Renders the loaded scene and saves it to the specified file location.

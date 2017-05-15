@@ -16,6 +16,19 @@ public class Set {
 	private ArrayList<Sphere> spheres;
 	private ArrayList<Plane> planes;
 	private ArrayList<Triangle> triangles;
+	private ArrayList<Primitive> all_primitives;
+	
+	public class PrimitiveAndIntersection
+	{
+		public Primitive primitive;
+		public Vector intersection;
+
+		public PrimitiveAndIntersection(Primitive primitive, Vector intersection) 
+		{
+			this.primitive = primitive;
+			this.intersection = intersection;
+		}
+	}
 	
 	public Set(double bg_r, double bg_g, double bg_b,
 			int shadow_rays, int rec_lvl, int sampl_lvl)
@@ -90,17 +103,81 @@ public class Set {
 	}
 	
 
-	public Color getColorAtIntersectionOfRay(Ray ray, int depth) 
+	/**
+	 * @pre - depth >= 1
+	 * @param ray
+	 * @param depth
+	 * @return
+	 */
+	public Color getColorAtIntersectionOfRay(Ray ray, int depth)
 	{
+		//-- find closest intersection
+		// TODO: can change "getClosestIntersectionAndPrimitive" to return both closest and
+		// second closest to the convenience of transparency calculation.
+		// => "get2ClosestIntersectionAndPrimitive" returns an array of 2 of PrimitiveAndIntersection.
+		PrimitiveAndIntersection pai = 
+				getClosestIntersectionAndPrimitive(ray); //by ref (please please work)
+		
+		Vector closest_intersection = pai.intersection; 
+		Primitive closest_primitive = pai.primitive;
+		
+		//-- if intersection == null return bgcolor
+		if (closest_intersection == null)
+			return bgcolor;
+			
+		Material m = closest_primitive.getMaterial();
+		double transp = m.getTransparencyCoeff();
+
+		//-- get diffusion color at intersection - including soft shadows
+		//		+ doesn't cast more rays (only toward lights)
+		Color diff_color = getDiffusionColorAtIntersection(closest_primitive, ray, closest_intersection);
+		
+		//-- get reflective color at intersection: (casts a ray recursively)
+		//	+ cast ray from intersection in the correct direction recursively
+		//	  depth = depth + 1 (if depth == max_recursion_lvl return bgcolor)
+		//  + inside this method if reflection color is black then return black immediately (no recursion).
+		Color reflection_color = getReflectionColor(ray, closest_intersection, closest_primitive, depth); //give it "inRay": inside this function it will cast an "outRay"
+		
+		//-- get transparent color at intersection: (computes color of next intersection of the same ray)
+		// + cast ray through primitive and get color "behind" it
+		// 	 same recursion.
+		//  + inside this method if transparencyCoeff is zero then return black immediately (no recursion).
+		Color transparency_color = getTransparencyColor(ray, depth); //searches for the 2nd intersection...
+		
+		//-- get specular color at intersection point
+		//      + doesn't cast more rays (only toward lights)
+		Color specular_color = getSpecularColor(closest_primitive, ray, closest_intersection);
+		
+		//-- color is:
+		//	transparency * "behind_color" + (1 - transparency) * (diffuse_color + specular_color) + relection_color
+		Color retColor = transparency_color.scalarMultipy(transp).add(
+				diff_color.add(specular_color).scalarMultipy(1 - transp)).add(reflection_color);
+				
+		// return color.trim()
+		retColor.trim();
+		return retColor;
+	}
+	 
+	private Color getSpecularColor(Primitive closest_primitive, Ray ray, Vector closest_intersection) {
+		// TODO Auto-generated method stub
+		return new Color(0,0,0);
+	}
+
+	private Color getTransparencyColor(Ray ray, int depth) {
+		// TODO Auto-generated method stub
+		return new Color(0,0,0);
+	}
+
+	private Color getReflectionColor(Ray ray, Vector closest_intersection, Primitive closest_primitive, int depth) {
+		// TODO Auto-generated method stub
+		return new Color(0,0,0);
+	}
+
+	public PrimitiveAndIntersection getClosestIntersectionAndPrimitive(Ray ray) 
+	{
+		// TODO: now doesn't account for hitting lights!
 		Vector closest_intersection = null;
 		Primitive closest_primitive = null;
-		//TODO: compute all_primitives only once somewhere else in the code
-		ArrayList<Primitive> all_primitives = new ArrayList<>();
-		all_primitives.addAll(spheres);
-		all_primitives.addAll(planes);
-		all_primitives.addAll(triangles);
-		
-		// TODO: now doesn't account for hitting lights!
 		for (Primitive primitive : all_primitives)
 		{
 			try 
@@ -114,7 +191,6 @@ public class Set {
 				{
 					if (closest_intersection != null)
 					{
-						//System.out.println("for ray " + ray + " intersection was not null!");
 						double currMinLength = closest_intersection.substract(ray.getOrigin()).magnitude();
 						double thisLength = curr_intsc.substract(ray.getOrigin()).magnitude();
 						if (thisLength < currMinLength)
@@ -137,14 +213,7 @@ public class Set {
 				e.printStackTrace();
 			}
 		}
-
-		Color colorAtIntersection = this.bgcolor;
-		if (closest_intersection != null)
-		{
-			colorAtIntersection = getColorAtIntersection(closest_primitive, ray, closest_intersection);
-		}
-		colorAtIntersection.trim();
-		return colorAtIntersection;
+		return new PrimitiveAndIntersection(closest_primitive, closest_intersection);
 	}
 	
 	public Color getBGColor()
@@ -152,31 +221,36 @@ public class Set {
 		return new Color(bgcolor);
 	}
 	
-	private Color getColorAtIntersection(Primitive primitive, Ray inRay, Vector intersection) 
+	private Color getDiffusionColorAtIntersection(Primitive primitive, Ray inRay, Vector intersection) 
 	{
-		// TODO: add reflection, specularity, transparancy, soft shadows...
 		Color color = new Color(0,0,0);
 		Color K_d = primitive.getMaterial().getDiffuseColor();
 		for (Light lit : lights)
 		{
 			try
 			{
+				Color litEffect = new Color(0,0,0);
 				//-- go back a little:
 				Vector go_back_a_little = new Vector(intersection.substract(inRay.getVector().timesScalar(Math.pow(10, -10))));//TODO: think about the correct timesScalar(?)
 
 				Vector L = lit.getOrigin().substract(go_back_a_little);
 				Vector N = primitive.normalAtIntersection(inRay).toUnit();
 				
+				//TODO: soft shadows : need more rays to be cast towards the light.
+				
 				Ray r = new Ray(go_back_a_little, L);
-				if (firstHit(r, lit))
+				
+				Color I_p = lit.getColor();
+				double factor = N.dotProduct(L.toUnit());
+				if (factor < 0)
+					factor = 0;
+				
+				litEffect = K_d.multiply(I_p).scalarMultipy(factor);
+				if (!firstHit(r, lit)) //if in the shadow: take account for shadow intensity.
 				{
-					Color I_p = lit.getColor();
-					double factor = N.dotProduct(L.toUnit());
-					//TODO: think about the correct factor
-					if (factor < 0)
-						factor = 0;
-					color = color.add(K_d.multiply(I_p).scalarMultipy(factor));
+					litEffect = litEffect.scalarMultipy(1 - lit.getShadowIntensity());
 				}
+				color = color.add(litEffect);
 			}
 			catch (RayTracerException e)
 			{
@@ -189,12 +263,6 @@ public class Set {
 
 	private boolean firstHit(Ray r, Light lit) 
 	{
-		//TODO: compute all_primitives only once somewhere else in the code
-		ArrayList<Primitive> all_primitives = new ArrayList<>();
-		all_primitives.addAll(spheres);
-		all_primitives.addAll(planes);
-		all_primitives.addAll(triangles);
-		
 		for (Primitive primitive : all_primitives)
 		{
 			try 
@@ -228,6 +296,13 @@ public class Set {
 	public String toString() {
 		return String.format("Set(%s, shadow(%d), rec(%d), sampl(%d))", bgcolor,
 				num_of_shadow_rays,  max_recursion_lvl,  super_sampling_lvl);
+	}
+
+	public void formAllPrimitivesList() {
+		all_primitives = new ArrayList<>();
+		all_primitives.addAll(spheres);
+		all_primitives.addAll(planes);
+		all_primitives.addAll(triangles);
 	}
 
 

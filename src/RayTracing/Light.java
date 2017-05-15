@@ -50,4 +50,9 @@ public class Light {
 	public Color getColor() {
 		return new Color(color);
 	}
+	
+	public double getShadowIntensity()
+	{
+		return shadow_intensity;
+	}
 }

@@ -1,5 +1,7 @@
 package RayTracing;
 
+import java.util.ArrayList;
+
 public class Camera {
 	
 	private Vector position;
@@ -55,7 +57,7 @@ public class Camera {
 				"upvect=" + up_vector + ")";
 	}
 
-	public Ray constructRayThroughPixel(int i, int j) 
+	public ArrayList<Ray> constructRaysThroughPixel(int i, int j) 
 	{
 		// http://web.cse.ohio-state.edu/~shen.94/681/Site/Slides_files/basic_algo.pdf
 		// slide 17:
@@ -83,11 +85,21 @@ public class Camera {
 		P = P.add(u.timesScalar(0.5 * screen_width / numOfCols)).add(
 				v.timesScalar(0.5 * screen_height / numOfRows));
 
-		//TODO: add super sampling here
-
+		//super sampling:
+		ArrayList<Ray> returnedRays = new ArrayList<>();
+		
+		// TODO: complete super sampling here
+		/*
+		 * Currently only one ray through middle of pixel.
+		 * Continue with:
+		 * + get N parameter for super sampling.
+		 * + make multiple rays in regard to N.
+		 * + random point from each grid slot, excluding borders.
+		 */
 		Vector vOfRay = P.substract(position);
 		Ray ray = new Ray(this.position, vOfRay); //TODO: check maybe ray's origin is P.
-		return ray;
+		returnedRays.add(ray);
+		return returnedRays;
 	}
 
 	public int getRows()

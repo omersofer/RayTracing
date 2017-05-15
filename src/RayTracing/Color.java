@@ -1,5 +1,7 @@
 package RayTracing;
 
+import java.util.ArrayList;
+
 public class Color {
 	/**
 	 * This class only supports element-wise operation.
@@ -62,6 +64,18 @@ public class Color {
 	@Override
 	public String toString() {
 		return String.format("rgb(%.2f,%.2f,%.2f)", rgb.x, rgb.y, rgb.z);
+	}
+
+	public static Color averageColor(ArrayList<Color> colors) 
+	{
+		Color c = new Color(0,0,0);
+		int len = colors.size();
+		for (Color col : colors)
+		{
+			c = c.add(col);
+		}
+		c = c.scalarMultipy(1/len);
+		return c;
 	}
 
 }
