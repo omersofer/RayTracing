@@ -116,13 +116,13 @@ public class Set {
 		// second closest to the convenience of transparency calculation.
 		// => "get2ClosestIntersectionAndPrimitive" returns an array of 2 of PrimitiveAndIntersection.
 		PrimitiveAndIntersection pai = 
-				getClosestIntersectionAndPrimitive(ray); //by ref (please please work)
+				getClosestIntersectionAndPrimitive(ray);
 		
 		Vector closest_intersection = pai.intersection; 
 		Primitive closest_primitive = pai.primitive;
 		
 		//-- if intersection == null return bgcolor
-		if (closest_intersection == null)
+		if (closest_intersection == null || depth == max_recursion_lvl)
 			return bgcolor;
 			
 		Material m = closest_primitive.getMaterial();
@@ -158,9 +158,43 @@ public class Set {
 		return retColor;
 	}
 	 
-	private Color getSpecularColor(Primitive closest_primitive, Ray ray, Vector closest_intersection) {
-		// TODO Auto-generated method stub
-		return new Color(0,0,0);
+	private Color getSpecularColor(Primitive closest_primitive, Ray ray, Vector closest_intersection) 
+	{
+		Color retColor = new Color(0,0,0);
+		//-- compute R vector (reflect)
+		// 	R = (2L*N)N-L
+		try {
+			Color specColor = closest_primitive.getMaterial().getSpecularColor();
+			double specIntens = closest_primitive.getMaterial().getSpecularityCoeff(); 
+			Vector N = closest_primitive.normalAtIntersection(ray);
+			for (Light lit : lights)
+			{
+				//-- go back a little:
+				Vector go_back_a_little = new Vector(closest_intersection.substract(ray.getVector().timesScalar(Math.pow(10, -10))));//TODO: think about the correct timesScalar(?)
+
+				Vector L = lit.getOrigin().substract(go_back_a_little);
+				Ray r = new Ray(go_back_a_little, L);
+				
+				if (!firstHit(r, lit)) //if in the shadow: take account for shadow intensity.
+				{
+					continue;
+				}
+				
+				//-- compute R vector (reflect)
+				// 	R = (2L*N)N-L
+				double two_L_dot_N = 2*L.dotProduct(N);
+				Vector R = N.timesScalar(two_L_dot_N).substract(L).toUnit();
+				Vector V = ray.getVector().timesScalar(-1).toUnit();
+				double directionalIntensity = Math.pow(R.dotProduct(V), specIntens);
+				Color litEffect = specColor.multiply(lit.getColor()).scalarMultipy(directionalIntensity);
+				
+				retColor = retColor.add(litEffect);
+			}
+		} catch (RayTracerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return retColor;
 	}
 
 	private Color getTransparencyColor(Ray ray, int depth) {
