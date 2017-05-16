@@ -111,18 +111,18 @@ public class Set {
 	 */
 	public Color getColorAtIntersectionOfRay(Ray ray, int depth)
 	{
+		//Check if got to max recursion level
+		if (depth >= max_recursion_lvl) 
+			return bgcolor;
+
 		//-- find closest intersection
-		// TODO: can change "getClosestIntersectionAndPrimitive" to return both closest and
-		// second closest to the convenience of transparency calculation.
-		// => "get2ClosestIntersectionAndPrimitive" returns an array of 2 of PrimitiveAndIntersection.
-		PrimitiveAndIntersection pai = 
-				getClosestIntersectionAndPrimitive(ray);
+		PrimitiveAndIntersection[] pai = get2ClosestIntersectionAndPrimitive(ray);
 		
-		Vector closest_intersection = pai.intersection; 
-		Primitive closest_primitive = pai.primitive;
+		Vector closest_intersection = pai[0].intersection;
+		Primitive closest_primitive = pai[0].primitive;
 		
 		//-- if intersection == null return bgcolor
-		if (closest_intersection == null || depth == max_recursion_lvl)
+		if (closest_intersection == null)
 			return bgcolor;
 			
 		Material m = closest_primitive.getMaterial();
@@ -142,8 +142,16 @@ public class Set {
 		// + cast ray through primitive and get color "behind" it
 		// 	 same recursion.
 		//  + inside this method if transparencyCoeff is zero then return black immediately (no recursion).
-		Color transparency_color = getTransparencyColor(ray, depth); //searches for the 2nd intersection...
-		
+		Color transparency_color = new Color(0,0,0);
+		if (transp != 0){
+			transparency_color = bgcolor;
+			//TODO: is this right way to calculate transparency?
+			if (pai[1].intersection != null){ //found 2nd intersection
+				Ray r = new Ray(pai[1].intersection, ray.getVector());
+				transparency_color = getColorAtIntersectionOfRay(r, depth+1); //searches for the 2nd intersection...
+			}
+		}
+
 		//-- get specular color at intersection point
 		//      + doesn't cast more rays (only toward lights)
 		Color specular_color = getSpecularColor(closest_primitive, ray, closest_intersection);
@@ -207,11 +215,13 @@ public class Set {
 		return new Color(0,0,0);
 	}
 
-	public PrimitiveAndIntersection getClosestIntersectionAndPrimitive(Ray ray) 
+	public PrimitiveAndIntersection[] get2ClosestIntersectionAndPrimitive(Ray ray)
 	{
 		// TODO: now doesn't account for hitting lights!
 		Vector closest_intersection = null;
 		Primitive closest_primitive = null;
+		Vector second_closest_intersection = null;
+		Primitive second_closest_primitive = null;
 		for (Primitive primitive : all_primitives)
 		{
 			try 
@@ -229,8 +239,24 @@ public class Set {
 						double thisLength = curr_intsc.substract(ray.getOrigin()).magnitude();
 						if (thisLength < currMinLength)
 						{
+							second_closest_intersection = closest_intersection;
+							second_closest_primitive = closest_primitive;
 							closest_intersection = curr_intsc;
 							closest_primitive = primitive;
+						}
+						else if (second_closest_intersection == null)
+						{
+							// second intersection
+							second_closest_intersection = curr_intsc;
+							second_closest_primitive = primitive;
+						}
+						else{
+							double currSecondMinLength = second_closest_intersection.substract(ray.getOrigin()).magnitude();
+							if (thisLength < currSecondMinLength)
+							{
+								second_closest_intersection = curr_intsc;
+								second_closest_primitive = primitive;
+							}
 						}
 					}
 					else
@@ -247,7 +273,11 @@ public class Set {
 				e.printStackTrace();
 			}
 		}
-		return new PrimitiveAndIntersection(closest_primitive, closest_intersection);
+		PrimitiveAndIntersection retArr[] = new PrimitiveAndIntersection[2];
+		retArr[0] = new PrimitiveAndIntersection(closest_primitive, closest_intersection);
+		retArr[1] = new PrimitiveAndIntersection(second_closest_primitive, second_closest_intersection);
+
+		return retArr;
 	}
 	
 	public Color getBGColor()

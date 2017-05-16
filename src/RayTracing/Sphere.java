@@ -14,13 +14,14 @@ public class Sphere extends Primitive {
 		this.radius = radius;
 	}
 
-	public Vector[] instersections(Ray r) throws RayTracerException 
+	public Vector[] calculate_intersections(Ray r) throws RayTracerException
 	{
+
 		if (origin.substract(r.getOrigin()).magnitude() < radius)
 		{
-			//TODO: consider supporting this case.
+			//TODO: act differently when ray's origin is inside sphere?
 			// means ray's origin inside sphere!
-			throw new RayTracerException("Unsupported Intersection calculation: Ray starts inside sphere");
+			//throw new RayTracerException("Unsupported Intersection calculation: Ray starts inside sphere");
 			//return null;
 		}
 
@@ -48,7 +49,7 @@ public class Sphere extends Primitive {
 	@Override
 	public Vector closerIntersectionPoint(Ray r) throws RayTracerException
 	{
-		Vector[] intersections = this.instersections(r);
+		Vector[] intersections = this.calculate_intersections(r);
 		if (intersections == null)
 			return null;
 		else if (intersections[0] == null && intersections[1] == null)
