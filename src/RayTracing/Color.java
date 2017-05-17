@@ -74,7 +74,7 @@ public class Color {
 		{
 			c = c.add(col);
 		}
-		c = c.scalarMultipy(1/len);
+		c = c.scalarMultipy(1.0/len);
 		return c;
 	}
 

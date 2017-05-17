@@ -31,7 +31,7 @@ public class WorkerThread implements Runnable {
     {
     	//-- decide about view plane grid
     	//-- and make a ray
-    	ArrayList<Ray> rays = cam.constructRaysThroughPixel(i,j);
+    	ArrayList<Ray> rays = cam.constructRaysThroughPixel(i, j, set.getSuper_sampling_lvl());
     	
     	//-- ray trace
     	ArrayList<Color> colors = rayTrace(rays);

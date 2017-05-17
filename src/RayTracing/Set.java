@@ -391,6 +391,10 @@ public class Set {
 		all_primitives.addAll(triangles);
 	}
 
+	public int getSuper_sampling_lvl() {
+		return super_sampling_lvl;
+	}
+
 
 	
 	

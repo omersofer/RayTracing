@@ -1,6 +1,7 @@
 package RayTracing;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Camera {
 	
@@ -57,7 +58,7 @@ public class Camera {
 				"upvect=" + up_vector + ")";
 	}
 
-	public ArrayList<Ray> constructRaysThroughPixel(int i, int j) 
+	public ArrayList<Ray> constructRaysThroughPixel(int i, int j, int super_sampling_lvl) 
 	{
 		// http://web.cse.ohio-state.edu/~shen.94/681/Site/Slides_files/basic_algo.pdf
 		// slide 17:
@@ -80,14 +81,29 @@ public class Camera {
 		Vector P = L.add(u.timesScalar(
 				j * W / numOfCols)).add(
 						v.timesScalar(i * H / numOfRows));
-
-		//Basic sampling - ofsset the ray to the center of the pixel
-		P = P.add(u.timesScalar(0.5 * screen_width / numOfCols)).add(
-				v.timesScalar(0.5 * screen_height / numOfRows));
-
+		
 		//super sampling:
+		Random generator = new Random();
 		ArrayList<Ray> returnedRays = new ArrayList<>();
 		
+		double miniPixelGrid_U = W / (numOfCols * super_sampling_lvl);
+		double miniPixelGrid_V = H / (numOfRows * super_sampling_lvl);
+		
+		for (int ii = 0; ii < super_sampling_lvl; ii++)
+		{
+			for (int jj = 0; jj < super_sampling_lvl; jj++)
+			{
+				Vector miniP = P.add(u.timesScalar(jj*miniPixelGrid_U)).add(v.timesScalar(ii*miniPixelGrid_V)); //base miniP
+				
+				miniP = miniP.add(v.timesScalar(miniPixelGrid_V * generator.nextDouble())).add(
+						u.timesScalar(miniPixelGrid_U * generator.nextDouble())); //random inside slot
+				
+				Vector vOfRay = miniP.substract(position);
+				Ray ray = new Ray(this.position, vOfRay); //TODO: check maybe ray's origin is P.
+				returnedRays.add(ray);
+			}
+		}
+	
 		// TODO: complete super sampling here
 		/*
 		 * Currently only one ray through middle of pixel.
@@ -96,9 +112,6 @@ public class Camera {
 		 * + make multiple rays in regard to N.
 		 * + random point from each grid slot, excluding borders.
 		 */
-		Vector vOfRay = P.substract(position);
-		Ray ray = new Ray(this.position, vOfRay); //TODO: check maybe ray's origin is P.
-		returnedRays.add(ray);
 		return returnedRays;
 	}
 
