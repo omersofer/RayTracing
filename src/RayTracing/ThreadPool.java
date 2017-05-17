@@ -14,8 +14,9 @@ public class ThreadPool {
 	{
 		executor = Executors.newFixedThreadPool(numOfWorkers);
 		this.rgbData = rgbData;
-		this.set = set;
 		this.cam = cam;
+		this.set = set;
+		this.set.setCamera(cam);
 	}
 	
     public void render(int numRows, int numCols) 

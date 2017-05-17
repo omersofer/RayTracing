@@ -55,4 +55,8 @@ public class Light {
 	{
 		return shadow_intensity;
 	}
+
+	public double getRadius() {
+		return radius;
+	}
 }

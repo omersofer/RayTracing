@@ -214,7 +214,7 @@ public class RayTracer
 		long endTime = System.currentTimeMillis();
 		Long renderTime = endTime - startTime;
 
-	    // The time is measured for your own conveniece, rendering speed will not affect your score
+	    // The time is measured for your own convenience, rendering speed will not affect your score
 		// unless it is exceptionally slow (more than a couple of minutes)
 		System.out.println("Finished rendering scene in " + renderTime.toString() + " milliseconds.");
 

@@ -155,4 +155,8 @@ public class Camera {
 		System.out.println(String.format("ViewingPlane: corners are (L,L2,L3,L4) = (%s,%s,%s,%s)",
 				L,L2,L3,L4));
 	}
+
+	public Vector get_up_vector() {
+		return new Vector(up_vector);
+	}
 }

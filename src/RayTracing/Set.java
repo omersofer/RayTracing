@@ -1,6 +1,7 @@
 package RayTracing;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import RayTracing.RayTracer.RayTracerException;
 
@@ -17,6 +18,8 @@ public class Set {
 	private ArrayList<Plane> planes;
 	private ArrayList<Triangle> triangles;
 	private ArrayList<Primitive> all_primitives;
+	
+	private Camera cam;
 	
 	public class PrimitiveAndIntersection
 	{
@@ -146,15 +149,7 @@ public class Set {
 		// + cast ray through primitive and get color "behind" it
 		// 	 same recursion.
 		//  + inside this method if transparencyCoeff is zero then return black immediately (no recursion).
-		Color transparency_color = new Color(0,0,0);
-		if (transp != 0){
-			transparency_color = bgcolor;
-			//TODO: is this right way to calculate transparency?
-			if (pai[1].intersection != null){ //found 2nd intersection
-				Ray r = new Ray(pai[1].intersection, ray.getVector());
-				transparency_color = getColorAtIntersectionOfRay(r, depth+1); //searches for the 2nd intersection...
-			}
-		}
+		Color transparency_color = getTransparencyColor(ray, depth, pai, transp);
 
 		//-- get specular color at intersection point
 		//      + doesn't cast more rays (only toward lights)
@@ -168,6 +163,19 @@ public class Set {
 		// return color.trim()
 		retColor.trim();
 		return retColor;
+	}
+
+	private Color getTransparencyColor(Ray ray, int depth, PrimitiveAndIntersection[] pai, double transp) {
+		Color transparency_color = new Color(0,0,0);
+		if (transp != 0){
+			transparency_color = bgcolor;
+			//TODO: is this right way to calculate transparency?
+			if (pai[1].intersection != null){ //found 2nd intersection
+				Ray r = new Ray(pai[1].intersection, ray.getVector());
+				transparency_color = getColorAtIntersectionOfRay(r, depth+1); //searches for the 2nd intersection...
+			}
+		}
+		return transparency_color;
 	}
 	 
 	private Color getSpecularColor(Primitive closest_primitive, Ray ray, Vector closest_intersection) 
@@ -187,7 +195,7 @@ public class Set {
 				Vector L = lit.getOrigin().substract(go_back_a_little);
 				Ray r = new Ray(go_back_a_little, L);
 				
-				if (!firstHit(r, lit)) //if in the shadow: take account for shadow intensity.
+				if (!firstHit(r, lit.getOrigin())) //if in the shadow: take account for shadow intensity.
 				{
 					continue;
 				}
@@ -207,11 +215,6 @@ public class Set {
 			e.printStackTrace();
 		}
 		return retColor;
-	}
-
-	private Color getTransparencyColor(Ray ray, int depth) {
-		// TODO Auto-generated method stub
-		return new Color(0,0,0);
 	}
 
 	private Color getReflectionColor(Ray ray_in, Vector closest_intersection, Primitive closest_primitive, int depth) {
@@ -315,27 +318,65 @@ public class Set {
 		{
 			try
 			{
+				Color I_p = lit.getColor();
 				Color litEffect = new Color(0,0,0);
 				//-- go back a little:
 				Vector go_back_a_little = new Vector(intersection.substract(inRay.getVector().timesScalar(Math.pow(10, -10))));//TODO: think about the correct timesScalar(?)
-
-				Vector L = lit.getOrigin().substract(go_back_a_little);
 				Vector N = primitive.normalAtIntersection(inRay).toUnit();
 				
-				//TODO: soft shadows : need more rays to be cast towards the light.
+				//-- define light rectangle
+				// http://web.cse.ohio-state.edu/~shen.94/681/Site/Slides_files/basic_algo.pdf
+				// slide 17:
 				
-				Ray r = new Ray(go_back_a_little, L);
-				
-				Color I_p = lit.getColor();
-				double factor = N.dotProduct(L.toUnit());
-				if (factor < 0)
-					factor = 0;
-				
-				litEffect = K_d.multiply(I_p).scalarMultipy(factor);
-				if (!firstHit(r, lit)) //if in the shadow: take account for shadow intensity.
+				Vector n = lit.getOrigin().substract(intersection).toUnit();
+				Vector u = cam.get_up_vector().crossProduct(n).toUnit();
+				Vector v = n.crossProduct(u);
+
+				// slide 19:
+				double a = lit.getRadius();
+				double slot = a / num_of_shadow_rays;
+
+				Vector C = new Vector(lit.getOrigin());
+
+				Vector BottomLeftCorner = C.substract(
+						u.timesScalar(a / 2)).substract(
+						v.timesScalar(a / 2));
+
+				Random generator = new Random();
+				double numOfShadowRaysHit = 0;
+				for (int ii = 0; ii < num_of_shadow_rays; ii++)
 				{
-					litEffect = litEffect.scalarMultipy(1 - lit.getShadowIntensity());
+					for (int jj = 0; jj < num_of_shadow_rays; jj++)
+					{
+						Color pLitEffect = new Color(0,0,0);
+						Vector P = BottomLeftCorner.add(u.timesScalar(jj * slot)).add(v.timesScalar(ii * slot));
+						P = P.add(u.timesScalar(slot * generator.nextDouble())).add(
+								v.timesScalar(slot * generator.nextDouble()));
+						
+						Vector L = P.substract(go_back_a_little);
+						
+						double factor = N.dotProduct(L.toUnit());
+						if (factor < 0)
+						{
+							factor = 0;
+						}
+						pLitEffect = K_d.multiply(I_p).scalarMultipy(factor);
+						
+						Ray r = new Ray(go_back_a_little, L);
+						if (firstHit(r, L))
+						{
+							numOfShadowRaysHit++;
+						}
+						else
+						{
+							pLitEffect = pLitEffect.scalarMultipy(1 - lit.getShadowIntensity());
+						}
+						litEffect = litEffect.add(pLitEffect);
+					}
 				}
+				double shadow_rays_factor = numOfShadowRaysHit / (num_of_shadow_rays * num_of_shadow_rays);
+				litEffect = litEffect.scalarMultipy(shadow_rays_factor);
+				litEffect = litEffect.scalarMultipy(1.0 / (num_of_shadow_rays * num_of_shadow_rays));
 				color = color.add(litEffect);
 			}
 			catch (RayTracerException e)
@@ -347,8 +388,7 @@ public class Set {
 		return color;
 	}
 
-	private boolean firstHit(Ray r, Light lit) 
-	{
+	private boolean firstHit(Ray r, Vector V) {
 		for (Primitive primitive : all_primitives)
 		{
 			try 
@@ -361,7 +401,7 @@ public class Set {
 				else
 				{
 					double lengthToPrimitive = in.substract(r.getOrigin()).magnitude();
-					double lengthToLight = lit.getOrigin().substract(r.getOrigin()).magnitude();
+					double lengthToLight = V.substract(r.getOrigin()).magnitude();
 					if (lengthToPrimitive < lengthToLight)
 					{
 						return false;
@@ -395,7 +435,8 @@ public class Set {
 		return super_sampling_lvl;
 	}
 
-
-	
-	
+	public void setCamera(Camera cam)
+	{
+		this.cam = cam;
+	}
 }
