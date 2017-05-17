@@ -48,7 +48,7 @@ public class Camera {
 		p = new Vector(px, py, pz);
 		l = new Vector(lx, ly, lz);
 		u = new Vector(ux, uy ,uz);
-		return new Camera(p,l,u, sc_d, sc_w, pw, ph);
+		return new Camera(p,l,u, sc_w, sc_d , pw, ph);
 	}
 	
 	@Override
