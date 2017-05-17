@@ -78,4 +78,9 @@ public class Color {
 		return c;
 	}
 
+	public boolean isNotBlack(){
+		if (rgb.x != 0 || rgb.y != 0 || rgb.z != 0) return true;
+		return false;
+	}
+
 }

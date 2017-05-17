@@ -127,6 +127,7 @@ public class Set {
 			
 		Material m = closest_primitive.getMaterial();
 		double transp = m.getTransparencyCoeff();
+		Color material_reflection_color = m.getReflectionColor();
 
 		//-- get diffusion color at intersection - including soft shadows
 		//		+ doesn't cast more rays (only toward lights)
@@ -136,8 +137,11 @@ public class Set {
 		//	+ cast ray from intersection in the correct direction recursively
 		//	  depth = depth + 1 (if depth == max_recursion_lvl return bgcolor)
 		//  + inside this method if reflection color is black then return black immediately (no recursion).
-		Color reflection_color = getReflectionColor(ray, closest_intersection, closest_primitive, depth); //give it "inRay": inside this function it will cast an "outRay"
-		
+		Color reflection_color = new Color(0,0,0);
+		if (material_reflection_color.isNotBlack()){
+			reflection_color = material_reflection_color.multiply(getReflectionColor(ray, closest_intersection, closest_primitive, depth));
+		}
+
 		//-- get transparent color at intersection: (computes color of next intersection of the same ray)
 		// + cast ray through primitive and get color "behind" it
 		// 	 same recursion.
@@ -210,9 +214,27 @@ public class Set {
 		return new Color(0,0,0);
 	}
 
-	private Color getReflectionColor(Ray ray, Vector closest_intersection, Primitive closest_primitive, int depth) {
-		// TODO Auto-generated method stub
-		return new Color(0,0,0);
+	private Color getReflectionColor(Ray ray_in, Vector closest_intersection, Primitive closest_primitive, int depth) {
+		//Check if got to max recursion level
+		if (depth >= max_recursion_lvl)
+			return bgcolor;
+
+		try{
+			//-- compute R vector (reflection)
+			// 	R = V -2(V*N)N
+			Vector V = ray_in.getVector();
+			Vector N = closest_primitive.normalAtIntersection(ray_in);
+			Vector ray_out_vector = V.substract(N.timesScalar(V.dotProduct(N) * 2));
+
+			Vector orig_go_back_a_little = new Vector(closest_intersection.substract(ray_out_vector.timesScalar(Math.pow(10, -10))));//TODO: think about the correct timesScalar(?)
+			Ray ray_out = new Ray(orig_go_back_a_little, ray_out_vector);
+			return (getColorAtIntersectionOfRay(ray_out,depth+1));
+		} catch (RayTracerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return bgcolor;
 	}
 
 	public PrimitiveAndIntersection[] get2ClosestIntersectionAndPrimitive(Ray ray)
