@@ -18,7 +18,7 @@ public class Triangle extends Primitive {
 		this.T3 = new Vector(T3);
 		
 		// for some point p=(x,y,z) on a plane, the plane is
-		// represented by: p*N + d = 0
+		// represented by: p*N - d = 0
 		
 		// calc norm
 		Vector side_a = T2.substract(T1);

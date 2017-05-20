@@ -56,6 +56,11 @@ public class Light {
 		return shadow_intensity;
 	}
 
+	public double getSpecularIntensity()
+	{
+		return specular_intensity;
+	}
+
 	public double getRadius() {
 		return radius;
 	}

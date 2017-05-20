@@ -58,6 +58,51 @@ public class Camera {
 				"upvect=" + up_vector + ")";
 	}
 
+	public int getRows()
+	{
+		return numOfRows;
+	}
+
+	public int getCols()
+	{
+		return numOfCols;
+	}
+
+	public Vector get_up_vector() {
+		return new Vector(up_vector);
+	}
+
+	//DEBUG ONLY. TODO: Broken - need to be updated.
+	public void printViewingPlane()
+	{
+		// http://web.cse.ohio-state.edu/~shen.94/681/Site/Slides_files/basic_algo.pdf
+		// slide 17:
+		Vector n = position.substract(look_at_point).toUnit();
+		Vector u = n.crossProduct(up_vector).toUnit();
+		Vector v = u.crossProduct(n);
+		System.out.println(String.format("ViewingPlane: eye coords are (u,v,n)=(%s,%s,%s)", u, v, n));
+		// slide 19:
+		// NOTE: doing a little different because we organize
+		// pixels differently
+
+		double d = screen_distance;
+		double aspectRatio = numOfRows / numOfCols; // h / w
+		double screen_height = aspectRatio * screen_width;
+		Vector C = position.substract(n.timesScalar(d));
+
+		//-- here L is top left
+		Vector L = C.substract(
+				u.timesScalar(screen_width / 2)).add(
+				v.timesScalar(screen_height / 2));
+
+		Vector L2 = L.add(u.timesScalar(screen_width));
+		Vector L3 = L2.substract(v.timesScalar(screen_height));
+		Vector L4 = L.substract(v.timesScalar(screen_height));
+
+		System.out.println(String.format("ViewingPlane: corners are (L,L2,L3,L4) = (%s,%s,%s,%s)",
+				L,L2,L3,L4));
+	}
+
 	public ArrayList<Ray> constructRaysThroughPixel(int i, int j, int super_sampling_lvl) 
 	{
 		// http://web.cse.ohio-state.edu/~shen.94/681/Site/Slides_files/basic_algo.pdf
@@ -82,7 +127,12 @@ public class Camera {
 				j * W / numOfCols)).add(
 						v.timesScalar(i * H / numOfRows));
 		
-		//super sampling:
+		/*
+		 * super sampling
+		 * + get N parameter for super sampling.
+		 * + make multiple rays in regard to N.
+		 * + random point from each grid slot, excluding borders.
+		 */
 		Random generator = new Random();
 		ArrayList<Ray> returnedRays = new ArrayList<>();
 		
@@ -94,69 +144,20 @@ public class Camera {
 			for (int jj = 0; jj < super_sampling_lvl; jj++)
 			{
 				Vector miniP = P.add(u.timesScalar(jj*miniPixelGrid_U)).add(v.timesScalar(ii*miniPixelGrid_V)); //base miniP
-				
-				miniP = miniP.add(v.timesScalar(miniPixelGrid_V * generator.nextDouble())).add(
-						u.timesScalar(miniPixelGrid_U * generator.nextDouble())); //random inside slot
+				double rand_v = generator.nextDouble();
+				while (rand_v == 0) rand_v = generator.nextDouble();//exclude the borders
+				double rand_u = generator.nextDouble();
+				while (rand_u == 0) rand_u = generator.nextDouble();//exclude the borders
+				miniP = miniP.add(v.timesScalar(miniPixelGrid_V * rand_v)).add(
+						u.timesScalar(miniPixelGrid_U * rand_u)); //random inside slot
 				
 				Vector vOfRay = miniP.substract(position);
 				Ray ray = new Ray(this.position, vOfRay); //TODO: check maybe ray's origin is P.
 				returnedRays.add(ray);
 			}
 		}
-	
-		// TODO: complete super sampling here
-		/*
-		 * Currently only one ray through middle of pixel.
-		 * Continue with:
-		 * + get N parameter for super sampling.
-		 * + make multiple rays in regard to N.
-		 * + random point from each grid slot, excluding borders.
-		 */
+
 		return returnedRays;
 	}
 
-	public int getRows()
-	{
-		return numOfRows;
-	}
-	
-	public int getCols()
-	{
-		return numOfCols;
-	}
-
-	//DEBUG ONLY. Broken - need to be updated.
-	public void printViewingPlane()
-	{
-		// http://web.cse.ohio-state.edu/~shen.94/681/Site/Slides_files/basic_algo.pdf
-		// slide 17:
-		Vector n = position.substract(look_at_point).toUnit();
-		Vector u = n.crossProduct(up_vector).toUnit();
-		Vector v = u.crossProduct(n);
-		System.out.println(String.format("ViewingPlane: eye coords are (u,v,n)=(%s,%s,%s)", u, v, n));
-		// slide 19:
-		// NOTE: doing a little different because we organize
-		// pixels differently
-		
-		double d = screen_distance;
-		double aspectRatio = numOfRows / numOfCols; // h / w
-		double screen_height = aspectRatio * screen_width;
-		Vector C = position.substract(n.timesScalar(d));
-		
-		//-- here L is top left
-		Vector L = C.substract(
-				u.timesScalar(screen_width / 2)).add(
-						v.timesScalar(screen_height / 2));
-		
-		Vector L2 = L.add(u.timesScalar(screen_width));
-		Vector L3 = L2.substract(v.timesScalar(screen_height));
-		Vector L4 = L.substract(v.timesScalar(screen_height));
-		
-		System.out.println(String.format("ViewingPlane: corners are (L,L2,L3,L4) = (%s,%s,%s,%s)",
-				L,L2,L3,L4));
-	}
-
-	public Vector get_up_vector() {
-		return new Vector(up_vector);
-	}
 }

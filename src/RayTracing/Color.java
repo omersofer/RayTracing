@@ -34,7 +34,7 @@ public class Color {
 		return new Color(rgb.timesVector(otherColor.rgb));
 	}
 	
-	public Color scalarMultipy(double factor)
+	public Color scalarMultiply(double factor)
 	{
 		return new Color(rgb.timesScalar(factor));
 	}
@@ -74,7 +74,7 @@ public class Color {
 		{
 			c = c.add(col);
 		}
-		c = c.scalarMultipy(1.0/len);
+		c = c.scalarMultiply(1.0/len);
 		return c;
 	}
 

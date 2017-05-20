@@ -17,24 +17,16 @@ public class Sphere extends Primitive {
 	public Vector[] calculate_intersections(Ray r) throws RayTracerException
 	{
 
-		if (origin.substract(r.getOrigin()).magnitude() < radius)
-		{
-			//TODO: act differently when ray's origin is inside sphere?
-			// means ray's origin inside sphere!
-			//throw new RayTracerException("Unsupported Intersection calculation: Ray starts inside sphere");
-			//return null;
-		}
-
 		//Calculations were took from Dani's presentation.
 		Vector L = origin.substract(r.getOrigin());
 		double t_ca = L.dotProduct(r.getVector());
 		if (t_ca < 0)
 			return null;
-		
+
 		double d_squared = Vector.dotProduct(L, L) - t_ca * t_ca;
 		if (d_squared > radius * radius)
 			return null;
-		
+
 		double t_hc = Math.sqrt(radius * radius - d_squared);
 		double t1 = t_ca - t_hc;
 		double t2 = t_ca + t_hc;
@@ -42,6 +34,24 @@ public class Sphere extends Primitive {
 		Vector[] intersection_points = new Vector[2];
 		intersection_points[0] = r.getOrigin().add(r.getUnitTimes(t1));
 		intersection_points[1] = r.getOrigin().add(r.getUnitTimes(t2));
+
+		//Act differently when ray's origin is inside sphere -
+		//take only one solution: (t_hc - t_ca) or (t_hc + t_ca) (calcs explanations are not included here yet)
+		if (origin.substract(r.getOrigin()).magnitude() < radius)
+		{
+			Vector r_new = r.getUnitTimes(t_ca + t_hc);
+			double epsilon = Math.pow(10, -10);
+
+			double t3;
+			if (Math.abs(radius * radius - L.dotProduct(L) - r_new.dotProduct(r_new) + 2*(r_new.dotProduct(L))) < epsilon){
+				t3 = t_hc + t_ca;
+			}else{
+				t3 = t_hc - t_ca;
+			}
+
+			intersection_points[0] =  r.getOrigin().add(r.getUnitTimes(t3));
+			intersection_points[1] = null;
+		}
 		
 		return intersection_points;
 	}
@@ -53,9 +63,7 @@ public class Sphere extends Primitive {
 		if (intersections == null)
 			return null;
 		else if (intersections[0] == null && intersections[1] == null)
-		{
 			return null;
-		}
 		else if (intersections[0] == null)
 			return intersections[1];
 		else if (intersections[1] == null)
