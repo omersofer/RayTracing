@@ -40,22 +40,28 @@ public class Triangle extends Primitive {
 		Vector p = pln.closerIntersectionPoint(r);
 		if (p == null)
 			return null;
-		Vector v1p = p.substract(T1);
-		
-		Vector v12 = T2.substract(T1).toUnit();
-		double l_a = v1p.dotProduct(v12);
-		double alpha = l_a / T2.substract(T1).magnitude();
-		
-		Vector v13 = T3.substract(T1).toUnit();
-		double l_b = v1p.dotProduct(v13);
-		double beta = l_b / T3.substract(T1).magnitude();
-		
-		if (0 <= alpha && alpha <= 1 &&
-				0 <= beta && beta <= 1 &&
-				alpha + beta <= 1)
-		{
-			return p;
-		}
+
+		//check if ray paraller to plane
+		if (this.pln.get_norm().dotProduct(r.getVector()) == 0)
+			return null;
+
+		// to find out if P is inside the triangle we can 
+		//test if the dot product of the vector along the edge and 
+		//the vector defined by the first vertex of the tested edge and P is positive 
+		//(meaning P is on the left side of the edge). 
+		//If P is on the left of all three edges, then P is inside the triangle.
+		//took from: 
+		//https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution
+		Vector edge0 = T2.substract(T1);
+		Vector edge1 = T3.substract(T2);
+		Vector edge2 = T1.substract(T3);
+		Vector C0 = p.substract(T1);
+		Vector C1 = p.substract(T2);
+		Vector C2 = p.substract(T3);
+		if (this.pln.get_norm().dotProduct(edge0.crossProduct(C0)) > 0 &&
+				this.pln.get_norm().dotProduct(edge1.crossProduct(C1)) > 0 &&
+				this.pln.get_norm().dotProduct(edge2.crossProduct(C2)) > 0) return p; // P is inside the triangle
+
 		return null;
 	}
 

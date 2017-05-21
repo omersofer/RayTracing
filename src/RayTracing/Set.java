@@ -21,6 +21,8 @@ public class Set {
 
 	private Camera cam;
 
+	private double go_a_little_factor = Math.pow(10, -10);//TODO: think about the correct value
+
 	public class PrimitiveAndIntersection {
 		public Primitive primitive;
 		public Vector intersection;
@@ -283,7 +285,7 @@ public class Set {
 				Color I_p = lit.getColor();
 				Color litEffect = new Color(0, 0, 0);
 				//-- go back a little:
-				Vector go_back_a_little = new Vector(intersection.substract(inRay.getVector().timesScalar(Math.pow(10, -10))));//TODO: think about the correct timesScalar(?)
+				Vector go_back_a_little = new Vector(intersection.substract(inRay.getVector().timesScalar(go_a_little_factor)));
 				Vector N = primitive.normalAtIntersection(inRay).toUnit();
 
 				//-- define light rectangle
@@ -388,7 +390,7 @@ public class Set {
 		if (transp != 0) {
 			transparency_color = bgcolor;
 
-			Vector go_front_a_little = new Vector(pai[0].intersection.add(ray.getVector().timesScalar(Math.pow(10, -10))));
+			Vector go_front_a_little = new Vector(pai[0].intersection.add(ray.getVector().timesScalar(go_a_little_factor)));
 			Ray r = new Ray(go_front_a_little, ray.getVector());
 			PrimitiveAndIntersection[] pai_new = get2ClosestIntersectionAndPrimitive(r);
 			Vector closest_intersection = pai_new[0].intersection;
@@ -415,7 +417,7 @@ public class Set {
 			Vector N = closest_primitive.normalAtIntersection(ray);
 			for (Light lit : lights) {
 				//-- go back a little:
-				Vector go_back_a_little = new Vector(closest_intersection.substract(ray.getVector().timesScalar(Math.pow(10, -10))));//TODO: think about the correct timesScalar(?)
+				Vector go_back_a_little = new Vector(closest_intersection.substract(ray.getVector().timesScalar(go_a_little_factor)));
 
 				Vector L = lit.getOrigin().substract(go_back_a_little);
 				Ray r = new Ray(go_back_a_little, L);

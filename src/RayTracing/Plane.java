@@ -78,4 +78,7 @@ public class Plane extends Primitive {
 			throw new RayTracerException("Plane material index error!");
 	}
 
+	protected Vector get_norm(){
+		return new Vector (this.normal);
+	}
 }
