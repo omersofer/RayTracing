@@ -192,7 +192,7 @@ public class Set {
 		return retVal;
 	}
 
-	private boolean isFirstHit(Ray r, Vector V) {
+	private boolean isFirstHit(Ray r, Vector P) {
 
 		for (Primitive primitive : all_primitives) {
 			try {
@@ -201,7 +201,7 @@ public class Set {
 					continue;
 				} else {
 					double lengthToPrimitive = in.substract(r.getOrigin()).magnitude();
-					double lengthToLight = V.substract(r.getOrigin()).magnitude();
+					double lengthToLight = P.substract(r.getOrigin()).magnitude();
 					if ((lengthToPrimitive < lengthToLight)) {
 						return false;
 					}
@@ -280,8 +280,10 @@ public class Set {
 	private Color getDiffusionColorAtIntersection(Primitive primitive, Ray inRay, Vector intersection) {
 		Color color = new Color(0, 0, 0);
 		Color K_d = primitive.getMaterial().getDiffuseColor();
-		for (Light lit : lights) {
-			try {
+		for (Light lit : lights) 
+		{
+			try 
+			{
 				Color I_p = lit.getColor();
 				Color litEffect = new Color(0, 0, 0);
 				//-- go back a little:
@@ -325,14 +327,10 @@ public class Set {
 
 						Ray r = new Ray(go_back_a_little, L);
 
-						if (isFirstHit(r, P)){//if (isFirstHit(r, L)){
-							numOfShadowRaysHit++;
+						double notFirstHitFactor = notFirstHitFactor(r, P);
+						if (!isFirstHit(r, P)){
+							pLitEffect = pLitEffect.scalarMultiply(1 - lit.getShadowIntensity()*(1-notFirstHitFactor));
 						}
-						else{
-							pLitEffect = pLitEffect.scalarMultiply(1 - lit.getShadowIntensity());
-						}
-//						double notFirstHitFactor = notFirstHitFactor(r, L);
-//
 //						numOfShadowRaysHit += notFirstHitFactor;
 //
 //						if (notFirstHitFactor != 1.0){
@@ -345,11 +343,13 @@ public class Set {
 						litEffect = litEffect.add(pLitEffect);
 					}
 				}
-				double shadow_rays_factor = numOfShadowRaysHit / (num_of_shadow_rays * num_of_shadow_rays);
-				litEffect = litEffect.scalarMultiply(shadow_rays_factor);
+//				double shadow_rays_factor = numOfShadowRaysHit / (num_of_shadow_rays * num_of_shadow_rays);
+//				litEffect = litEffect.scalarMultiply(shadow_rays_factor);
 				litEffect = litEffect.scalarMultiply(1.0 / (num_of_shadow_rays * num_of_shadow_rays));
 				color = color.add(litEffect);
-			} catch (RayTracerException e) {
+			}
+			catch (RayTracerException e) 
+			{
 				e.printStackTrace();
 				continue;
 			}
@@ -372,7 +372,7 @@ public class Set {
 			Vector orig_go_back_a_little = new Vector(closest_intersection.substract(ray_out_vector.timesScalar(Math.pow(10, -10))));//TODO: think about the correct timesScalar(?)
 			Ray ray_out = new Ray(orig_go_back_a_little, ray_out_vector);
 
-			return (getColorAtIntersectionOfRay(ray_out, depth + 1));
+			return getColorAtIntersectionOfRay(ray_out, depth + 1);
 		} catch (RayTracerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

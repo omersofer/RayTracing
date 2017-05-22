@@ -1,7 +1,5 @@
 package RayTracing;
 
-import RayTracing.RayTracer.RayTracerException;
-
 public class Light {
 
 	private Vector origin;

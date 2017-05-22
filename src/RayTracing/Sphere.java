@@ -20,7 +20,7 @@ public class Sphere extends Primitive {
 		//Calculations were took from Dani's presentation.
 		Vector L = origin.substract(r.getOrigin());
 		double t_ca = L.dotProduct(r.getVector());
-		if (t_ca < 0)
+		if (t_ca < 0)// && (origin.substract(r.getOrigin()).magnitude() > radius))
 			return null;
 
 		double d_squared = Vector.dotProduct(L, L) - t_ca * t_ca;
@@ -39,16 +39,8 @@ public class Sphere extends Primitive {
 		//take only one solution: (t_hc - t_ca) or (t_hc + t_ca) (calcs explanations are not included here yet)
 		if (origin.substract(r.getOrigin()).magnitude() < radius)
 		{
-			Vector r_new = r.getUnitTimes(t_ca + t_hc);
-			double epsilon = Math.pow(10, -10);
-
-			double t3;
-			if (Math.abs(radius * radius - L.dotProduct(L) - r_new.dotProduct(r_new) + 2*(r_new.dotProduct(L))) < epsilon){
-				t3 = t_hc + t_ca;
-			}else{
-				t3 = t_hc - t_ca;
-			}
-
+			
+			double t3 = t_hc + t_ca;
 			intersection_points[0] =  r.getOrigin().add(r.getUnitTimes(t3));
 			intersection_points[1] = null;
 		}
@@ -82,6 +74,10 @@ public class Sphere extends Primitive {
 	{
 		Vector P = closerIntersectionPoint(r);
 		Vector N = P.substract(origin);
+		if (origin.substract(r.getOrigin()).magnitude() < radius)
+		{
+			N = N.timesScalar(-1.0);
+		}
 		N.normalize();
 		return N;
 	}
@@ -101,8 +97,11 @@ public class Sphere extends Primitive {
 		int matInx = Integer.parseInt(params[4]); 
 		
 		Material m = set.getMaterial(matInx);
-		if (m != null)
-			return new Sphere(m, new Vector(px,py,pz), rd);
+		if (m != null){
+			Material mtag = new Material(m);
+			mtag.makeMoreTransparent();
+			return new Sphere(mtag, new Vector(px,py,pz), rd);			
+		}
 		else
 			throw new RayTracerException("Sphere material index error!");
 	}

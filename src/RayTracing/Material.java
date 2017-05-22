@@ -70,6 +70,10 @@ public class Material
 	{
 		return matInx;
 	}
+	
+	public void makeMoreTransparent(){
+		transparencyCoeff = Math.sqrt(transparencyCoeff);
+	}
 
 	public static Material parseMaterial(String[] params) 
 	{
