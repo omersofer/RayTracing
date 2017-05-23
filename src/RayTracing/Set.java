@@ -369,8 +369,8 @@ public class Set {
 			Vector N = closest_primitive.normalAtIntersection(ray_in);
 			Vector ray_out_vector = V.substract(N.timesScalar(V.dotProduct(N) * 2));
 
-			Vector orig_go_back_a_little = new Vector(closest_intersection.substract(ray_out_vector.timesScalar(Math.pow(10, -10))));//TODO: think about the correct timesScalar(?)
-			Ray ray_out = new Ray(orig_go_back_a_little, ray_out_vector);
+			Vector orig_go_front_a_little = new Vector(closest_intersection.add(ray_out_vector.timesScalar(go_a_little_factor)));
+			Ray ray_out = new Ray(orig_go_front_a_little, ray_out_vector);
 
 			return getColorAtIntersectionOfRay(ray_out, depth + 1);
 		} catch (RayTracerException e) {
