@@ -21,7 +21,7 @@ public class Set {
 
 	private Camera cam;
 
-	private double go_a_little_factor = Math.pow(10, -10);//TODO: think about the correct value
+	private double go_a_little_factor = Math.pow(10, -10);
 
 	public class PrimitiveAndIntersection {
 		public Primitive primitive;
@@ -332,17 +332,11 @@ public class Set {
 
 						double notFirstHitFactor = notFirstHitFactor(r, P);
 						if (!isFirstHit(r, P)){
-							//TODO: consider removing "*(1-notFirstHitFactor)"
 							pLitEffect = pLitEffect.scalarMultiply(1 - lit.getShadowIntensity()*(1-notFirstHitFactor));
-							//pLitEffect = pLitEffect.scalarMultiply(1 - lit.getShadowIntensity());
 						}
-//						numOfShadowRaysHit += notFirstHitFactor;
-
 						litEffect = litEffect.add(pLitEffect);
 					}
 				}
-//				double shadow_rays_factor = numOfShadowRaysHit / (num_of_shadow_rays * num_of_shadow_rays);
-//				litEffect = litEffect.scalarMultiply(shadow_rays_factor);
 				litEffect = litEffect.scalarMultiply(1.0 / (num_of_shadow_rays * num_of_shadow_rays));
 				color = color.add(litEffect);
 			}
@@ -393,22 +387,10 @@ public class Set {
 			PrimitiveAndIntersection[] pai_new = get2ClosestIntersectionAndPrimitive(r);
 
 			Vector closest_intersection = pai_new[0].intersection;
-			//dont take next intersetion if with the same primitive
-//			if (pai_new[0].primitive != pai[0].primitive){
-//				closest_intersection = pai_new[0].intersection;
-//			}
-//			else{//take next one
-//				closest_intersection = pai_new[1].intersection;
-//			}
 
 			//-- if intersection == null return bgcolor
 			if (closest_intersection != null)
 				transparency_color = getColorAtIntersectionOfRay(r, depth + 1);
-
-//			if (pai[1].intersection != null) { //found 2nd intersection
-//				Ray r = new Ray(pai[1].intersection, ray.getVector());
-//				transparency_color = getColorAtIntersectionOfRay(r, depth + 1);
-//			}
 		}
 		return transparency_color;
 	}
@@ -428,17 +410,6 @@ public class Set {
 				Vector L = lit.getOrigin().substract(go_back_a_little);
 				Ray r = new Ray(go_back_a_little, L);
 
-//				double notFirstHitFactor = notFirstHitFactor(r, lit.getOrigin());
-//				if (notFirstHitFactor == 0) //if in the shadow: take account for shadow intensity.
-//				{
-//					continue;
-//				}
-
-//				if (!isFirstHit(r, lit.getOrigin())) //if in the shadow: take account for shadow intensity.
-//				{
-//					continue;
-//				}
-
 				//-- compute R vector (reflect)
 				// 	R = (2L*N)N-L
 				double two_L_dot_N = 2 * L.dotProduct(N);
@@ -452,14 +423,12 @@ public class Set {
 				else{
 					directionalIntensity = Math.pow(directionalIntensity, specIntens);
 				}
-				//double directionalIntensity = Math.pow(R.dotProduct(V), specIntens);
 
 				double litSpecIntens = lit.getSpecularIntensity();
 				Color litEffect = specColor.multiply(lit.getColor().scalarMultiply(litSpecIntens)).scalarMultiply(directionalIntensity);//.scalarMultiply(notFirstHitFactor);
 
-				if (!isFirstHit(r, lit.getOrigin())) //if in the shadow: take account for shadow intensity.
+				if (!isFirstHit(r, lit.getOrigin()))
 				{
-					//TODO: consider removing "*(1-notFirstHitFactor)"
 					double notFirstHitFactor = notFirstHitFactor(r, lit.getOrigin());
 					litEffect = litEffect.scalarMultiply(1 - lit.getShadowIntensity()*(1-notFirstHitFactor));
 				}
