@@ -40,7 +40,6 @@ public class Plane extends Primitive {
 		}
 		else
 		{
-			//TODO: this is still not understood - check which normal should be returned in each case.
 			Vector a_little_this_way = intersection.add(normal);
 			Vector a_little_that_way = intersection.add(normal.timesScalar(-1));
 			double this_way_dist = a_little_this_way.substract(r.getOrigin()).magnitude();
