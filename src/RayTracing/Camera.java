@@ -152,7 +152,7 @@ public class Camera {
 						u.timesScalar(miniPixelGrid_U * rand_u)); //random inside slot
 				
 				Vector vOfRay = miniP.substract(position);
-				Ray ray = new Ray(this.position, vOfRay); //TODO: check maybe ray's origin is P.
+				Ray ray = new Ray(this.position, vOfRay);
 				returnedRays.add(ray);
 			}
 		}
