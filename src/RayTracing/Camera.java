@@ -145,9 +145,9 @@ public class Camera {
 			{
 				Vector miniP = P.add(u.timesScalar(jj*miniPixelGrid_U)).add(v.timesScalar(ii*miniPixelGrid_V)); //base miniP
 				double rand_v = generator.nextDouble();
-				while (rand_v == 0) rand_v = generator.nextDouble();//exclude the borders
+				while (rand_v == 0.0) rand_v = generator.nextDouble();//exclude the borders
 				double rand_u = generator.nextDouble();
-				while (rand_u == 0) rand_u = generator.nextDouble();//exclude the borders
+				while (rand_u == 0.0) rand_u = generator.nextDouble();//exclude the borders
 				miniP = miniP.add(v.timesScalar(miniPixelGrid_V * rand_v)).add(
 						u.timesScalar(miniPixelGrid_U * rand_u)); //random inside slot
 				
