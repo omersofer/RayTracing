@@ -38,9 +38,9 @@ public class WorkerThread implements Runnable {
     	
     	Color c = Color.averageColor(colors);
     	
-    	rgbData[((cam.getRows()-1 - i)*cam.getCols() + (cam.getCols()-1 - j))*3 + 0] = (byte)(c.getR()*255);//(cam.getRows()-1 - i)
-    	rgbData[((cam.getRows()-1 - i)*cam.getCols() + (cam.getCols()-1 - j))*3 + 1] = (byte)(c.getG()*255);//(cam.getRows()-1 - i)
-    	rgbData[((cam.getRows()-1 - i)*cam.getCols() + (cam.getCols()-1 - j))*3 + 2] = (byte)(c.getB()*255);//(cam.getRows()-1 - i)
+    	rgbData[((cam.getRows()-1 - i)*cam.getCols() + (cam.getCols()-1 - j))*3 + 0] = (byte)(c.getR()*255);
+    	rgbData[((cam.getRows()-1 - i)*cam.getCols() + (cam.getCols()-1 - j))*3 + 1] = (byte)(c.getG()*255);
+    	rgbData[((cam.getRows()-1 - i)*cam.getCols() + (cam.getCols()-1 - j))*3 + 2] = (byte)(c.getB()*255);
     }
 
     private ArrayList<Color> rayTrace(ArrayList<Ray> rays) 
