@@ -99,8 +99,6 @@ public class Sphere extends Primitive {
 		
 		Material m = set.getMaterial(matInx);
 		if (m != null){
-			//Material mtag = new Material(m);
-			//mtag.makeMoreTransparent();
 			return new Sphere(m, new Vector(px,py,pz), rd);
 		}
 		else
