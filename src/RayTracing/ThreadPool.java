@@ -21,7 +21,6 @@ public class ThreadPool {
 	
     public void render(int numRows, int numCols) 
     {
-    	//cam.printViewingPlane(); //TODO: debug, can remove sometime...
         for (int i = 0; i < numRows	; i++) 
         {
         	for (int j = 0; j < numCols; j++)
